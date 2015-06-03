@@ -1,7 +1,9 @@
 import ImageFilter
+import numpy
 from PIL import Image
 from PIL import ImageStat
 from colorsys import * 
+
 
 #Extract all nxn rectangles from an image (these will be processed then used as inputs for ML algorithm). 
 def getSub(n, imageName): 
@@ -61,14 +63,38 @@ def findYellow(imageName):
     portion = float(count)/totalPix
     #print(portion)
     return portion
+    
+def colorVariance(imageName):
+    ''' calculates the diversity in color using a hue histogram'''
+    
+    # load image pixels
+    im = Image.open(imageName)
+    pix = im.load()
+    width, height = im.size
+    
+    # create empty histogram to be filled with frequencies
+    histogram = [0]*360
+    pixelHue = 0
+    for i in range(width):
+        for j in range(height):
+            (r,g,b) = pix[i,j] #pull out the current r,g,b values 
+            (h,s,v) = rgb_to_hsv(r/255.,g/255.,b/255.)
+            pixelHue = int(360*h)
+            #build histogram
+            histogram[pixelHue] += 1
+    
+    # calculate standard deviation of histogram
+    return numpy.std(histogram)
+        
+    
       
-def countEdgePixels(file):
+def countEdgePixels(imageName):
     ''' counts the number of pixels that make up the edges of features'''
     # define threshold for edges
     threshold = 150 
     
     # open image and filter
-    im = Image.open(file)
+    im = Image.open(imageName)
     im2 = im.filter(ImageFilter.FIND_EDGES)
     im2.save("Filtered.jpg")
     im2 = im2.convert("L")
