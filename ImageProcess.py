@@ -82,7 +82,7 @@ def colorVariance(imageName):
             pixelHue = int(360*h)
             #build histogram
             histogram[pixelHue] += 1
-    
+    print histogram
     # calculate standard deviation of histogram
     return numpy.std(histogram)
         
