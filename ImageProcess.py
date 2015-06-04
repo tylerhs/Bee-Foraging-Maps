@@ -120,7 +120,7 @@ def calcMetrics(imageName, tileSize, overlap):
         returns a dictionary containing metric vectors keyed by (i,j) coordinates 
         of the upper left hand of the tile desired.""" 
     im = Image.open(imageName)
-    subDict = getSub(tileSize, im) 
+    subDict = getSub(tileSize, imageName) 
     finalMetrics = allMetrics(subDict, tileSize, im, overlap) 
     return finalMetrics
 
