@@ -3,6 +3,7 @@ import numpy
 from PIL import Image
 from PIL import ImageStat
 from colorsys import * 
+import time
 
 
 #Extract all nxn rectangles from an image (these will be processed then used as inputs for ML algorithm). 
