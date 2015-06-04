@@ -84,6 +84,8 @@ def getSub(n, imageName):
    ## return subList #return a list of images (use image.show() to display). 
     
 def allMetrics(dictionary,n, im, overlap): 
+    """Takes in a dictionary of results from small tiles and calculates average metrics 
+    	for a larger tile of size n, in image im, with overlap percentage im."""
     width, height = im.size 
   #  print dictionary
     FinalMetricDict = {}
@@ -113,7 +115,7 @@ def allMetrics(dictionary,n, im, overlap):
                    
                     
                 
-def calcMetrics(imageNmae, tileSize, overlap): 
+def calcMetrics(imageName, tileSize, overlap): 
     """wrapper function to calculate metrics for each tile of the image.
         returns a dictionary containing metric vectors keyed by (i,j) coordinates 
         of the upper left hand of the tile desired.""" 
