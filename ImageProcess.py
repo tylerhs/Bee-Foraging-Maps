@@ -75,10 +75,10 @@ def getSub(n, imageName):
 
 #Start of helper functions for computing metrics. 
     
-def colorAvg(imageName): 
+def colorAvg(im): 
     """Takes in a string containing an image file name, returns the average red, blue, and green 
         values for all the pixels in that image.""" 
-    im = Image.open(imageName) 
+    #im = Image.open(imageName) 
     imStats = ImageStat.Stat(im) 
     (redAv, greenAv, blueAv) = imStats.mean
     return redAv, greenAv, blueAv
@@ -88,9 +88,9 @@ def colorAvg(imageName):
   #rgb_to_hsv(r/255.,g/255.,b/255.)  converts pixel coords to HSV coords 
   
    
-def findYellow(imageName): 
+def findYellow(im): 
     """counts the number of yellow pixels in the given image.""" 
-    im = Image.open(imageName)
+    #im = Image.open(imageName)
     pix = im.load() #load in pixel array  
     #define HSV value ranges for yellow  
     #for now just base of Hue - refine for actual yellows seen in field? 
@@ -109,11 +109,11 @@ def findYellow(imageName):
     #print(portion)
     return portion
     
-def colorVariance(imageName):
+def colorVariance(im):
     ''' calculates the diversity in color using a hue histogram'''
     
     # load image pixels
-    im = Image.open(imageName)
+    #im = Image.open(imageName)
     pix = im.load()
     width, height = im.size
     
@@ -127,21 +127,21 @@ def colorVariance(imageName):
             pixelHue = int(360*h)
             #build histogram
             histogram[pixelHue] += 1
-    print histogram
+    #print histogram
     # calculate standard deviation of histogram
     return numpy.std(histogram)
         
     
       
-def countEdgePixels(imageName):
+def countEdgePixels(im):
     ''' counts the number of pixels that make up the edges of features'''
     # define threshold for edges
     threshold = 150 
     
     # open image and filter
-    im = Image.open(imageName)
+    #im = Image.open(imageName)
     im2 = im.filter(ImageFilter.FIND_EDGES)
-    im2.save("Filtered.jpg")
+    #im2.save("Filtered.jpg")
     im2 = im2.convert("L")
 	
     # load pixels and count edge pixels
@@ -153,15 +153,15 @@ def countEdgePixels(imageName):
                 pixels += 1
 
     return float(pixels) / (im.size[0]*im.size[1])
-
-def textureAnalysis(imageName):
-    ''' determines the proportion of small grids that have distinct texture'''
+    
+def textureAnalysis(im):
+    ''' determines the proportion of the image that has texture'''
     # define texture threshold and grid size
     threshold = 100
-    n = 5
+    n = 7
     
     # open image
-    im = Image.open(imageName)
+    #im = Image.open(imageName)
     width, height = im.size
     
     # loop across image
@@ -174,12 +174,9 @@ def textureAnalysis(imageName):
             imTemp = im.crop(box)
             
             # calculate intensity from RGB data
-            rImage, gImage, bImage = imTemp.split()
-            rData = list(rImage.getdata())
-            gData = list(rImage.getdata())
-            bData = list(rImage.getdata())
-            intensity =  [rData[i]+gData[i]+bData[i] for i in range(len(rData))]
-            
+            pixels = list(imTemp.getdata())
+            intensity =  [pixels[i][0]+pixels[i][1]+pixels[i][2] for i in range(len(pixels))]
+                      
             # count as high texture if difference in intensity is 
             # greater than threshold
             if ((max(intensity) - min(intensity)) > threshold):
@@ -200,7 +197,6 @@ def findYellowFast(im):
    # maxSat = 0.4
    
     minV = 0.5
-    
     
     width, height = im.size  #find the size of the image 
     count = 0 #initialize a counter for yellow pixels.  
