@@ -40,7 +40,7 @@ def colorAvg(imageName):
     
     
 
-  #rgb_to_hsv(r,g,b)  converts pixel coords to HSV coords 
+  #rgb_to_hsv(r/255.,g/255.,b/255.)  converts pixel coords to HSV coords 
   
    
 def findYellow(imageName): 
