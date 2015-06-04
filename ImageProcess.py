@@ -80,6 +80,37 @@ def getSub(n, imageName):
    return MetricDict
    ## return subList #return a list of images (use image.show() to display). 
     
+def allMetrics(dictionary,n, im, overlap): 
+    width, height = im.size 
+    
+    FinalMetricDict = {}
+    for i in range(0,width, overlap*n): 
+        for j in range(0,height, overlap*n): 
+            #you're at the start of a box 
+            metricTotals = []
+            for k in range(i,n-overlap*n, overlap*n): 
+                for m in range(j, n-overlap*n, overlap*n): 
+                    #pull out metrics 
+                    metrics = dictionary[(k,m)] 
+                    #Color average 
+                    metricTotals = map(add, metricTotals, metrics) 
+            metricAvg = metricTotals/(1/(overlap**2))
+            FinalMetricDict[(i,j)] = metricAvg #fill in a dictionary keyed by upper left coord. of larger square 
+            #dictionary holds the overall metrics for that square.  
+    return FinalMetricDict 
+            
+                   
+                    
+                
+def calcMetrics(imageNmae, tileSize, overlap): 
+    """wrapper function to calculate metrics for each tile of the image.
+        returns a dictionary containing metric vectors keyed by (i,j) coordinates 
+        of the upper left hand of the tile desired.""" 
+    im = Image.open(imageName)
+    subDict = getSub(tileSize, im) 
+    finalMetrics = allMetrics(subDict, tileSize, im, overlap) 
+    return finalMetrics
+
 
 #Start of helper functions for computing metrics. 
     
