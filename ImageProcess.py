@@ -33,10 +33,11 @@ def getSub(n, imageName):
     textList = []
     textTimeL = []
     
+    MetricDict = {} #initialize empty dict. 
     # Extract all tiles using a specific overlap (overlap depends on n)
     for i in range(0,width - n+1, int(overlap*n)): #Go through the entire image 
         for j in range(0, length - n+1, int(overlap*n)): 
-            box = (i,j,i+n, j+n)  #edge coordinates of the next rectangle. 
+            box = (i,j,i + overlap*n, j+overlap*n)  #edge coordinates of the next rectangle. 
             newImage = image.crop(box) #pull out the desired rectangle
             #subList += [newImage] #More efficient way to store each image? 
             ##Add in metric calculations here - don't need to store 
@@ -69,7 +70,14 @@ def getSub(n, imageName):
             edgeList += [edges]
             textList += [texture]
             
-    return avgList, yellowList, varList, edgeList, textList, avgTimeL, yellowTimeL, varTimeL, edgeTimeL, textTimeL
+            Metrics = (avg, yellow, var, edges, texture) #store metrics
+            
+            MetricDict[(i,j)] = Metrics
+            
+            
+            
+   # return avgList, yellowList, varList, edgeList, textList, avgTimeL, yellowTimeL, varTimeL, edgeTimeL, textTimeL
+   return MetricDict
    ## return subList #return a list of images (use image.show() to display). 
     
 
