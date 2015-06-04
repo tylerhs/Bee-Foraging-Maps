@@ -214,4 +214,72 @@ def findYellowFast(im):
     return portion
 def getHSV((r,g,b)): 
     return rgb_to_hsv(r/255., g/255., b/255.)
+    
+def analysis(avg, yellow, var, edges, texture): 
+    """analyze things to check if they work""" 
+    r = [a[0] for a in avg]
+    ravg = numpy.mean(r)
+    rmin = min(r) 
+    rmax = max(r)
+    g = [a[1] for a in avg]
+    gavg = numpy.mean(g)
+    gmin = min(g) 
+    gmax = max(g)
+    b = [a[2] for a in avg]
+    bavg = numpy.mean(b)
+    bmin = min(b) 
+    bmax = max(b)
+    
+    
+    print('Red Statistics') 
+    print('Average is ', ravg) 
+    print('Min is ', rmin)
+    print('Max is ', rmax)
+    
+    print('Green Statistics') 
+    print('Average is ', gavg) 
+    print('Min is ', gmin)
+    print('Max is ', gmax)
+    
+    print('Blue Statistics') 
+    print('Average is ', bavg) 
+    print('Min is ', bmin)
+    print('Max is ', bmax)
+    
+    
+    yavg = numpy.mean(yellow)
+    ymin = min(yellow)
+    ymax = max(yellow)
+    
+    print 'Yellow Statistics' 
+    print 'Average is ', yavg 
+    print 'Min is ', ymin 
+    print 'Max is ', ymax
+    
+    vavg = numpy.mean(var)
+    vmin= min(var)
+    vmax = max(var) 
+    
+    print 'Color Variance Statistics' 
+    print 'Average is ', vavg 
+    print 'Min is ', vmin 
+    print 'Max is ', vmax
+    
+    eavg = numpy.mean(edges)
+    emin= min(edges)
+    emax = max(edges) 
+    
+    print 'Edge Count Statistics' 
+    print 'Average is ', eavg 
+    print 'Min is ', emin 
+    print 'Max is ', emax
+    
+    tavg = numpy.mean(texture) 
+    tmin= min(texture)
+    tmax = max(texture) 
+    print 'Texture Statistics' 
+    print 'Average is ', tavg 
+    print 'Min is ', tmin 
+    print 'Max is ', tmax
+
             
