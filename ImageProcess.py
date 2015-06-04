@@ -4,6 +4,10 @@ from PIL import Image
 from PIL import ImageStat
 from colorsys import * 
 import time
+from operator import add
+#from multiprocessing import Pool
+
+#p = Pool(2)
 
 
 #Extract all nxn rectangles from an image (these will be processed then used as inputs for ML algorithm). 
@@ -35,12 +39,14 @@ def getSub(n, imageName):
     
     MetricDict = {} #initialize empty dict. 
     # Extract all tiles using a specific overlap (overlap depends on n)
-    for i in range(0,width - n+1, int(overlap*n)): #Go through the entire image 
-        for j in range(0, length - n+1, int(overlap*n)): 
-            box = (i,j,i + overlap*n, j+overlap*n)  #edge coordinates of the next rectangle. 
+    for i in range(0,int(width - overlap*n), int(overlap*n)): #Go through the entire image 
+        for j in range(0, int(length - overlap*n), int(overlap*n)): 
+            box = (i,j,i+n, j+n)  #edge coordinates of the next rectangle. 
             newImage = image.crop(box) #pull out the desired rectangle
-            #subList += [newImage] #More efficient way to store each image? 
+        #    subList += [newImage] #More efficient way to store each image? 
             ##Add in metric calculations here - don't need to store 
+            
+            
             ###TEMPORARY METRIC CALCULATIONS 
             start = time.time()
             avg = colorAvg(newImage) 
@@ -69,33 +75,38 @@ def getSub(n, imageName):
             varList += [var] 
             edgeList += [edges]
             textList += [texture]
-            
-            Metrics = (avg, yellow, var, edges, texture) #store metrics
+            Metrics = (avg[0], avg[1], avg[2], yellow, var, edges, texture) #store metrics
             
             MetricDict[(i,j)] = Metrics
-            
-            
-            
+
    # return avgList, yellowList, varList, edgeList, textList, avgTimeL, yellowTimeL, varTimeL, edgeTimeL, textTimeL
-   return MetricDict
+    return MetricDict
    ## return subList #return a list of images (use image.show() to display). 
     
 def allMetrics(dictionary,n, im, overlap): 
     width, height = im.size 
-    
+  #  print dictionary
     FinalMetricDict = {}
-    for i in range(0,width, overlap*n): 
-        for j in range(0,height, overlap*n): 
+    for i in range(0,int(width - n), int(overlap*n)): 
+        for j in range(0,int(height- n), int(overlap*n)): 
             #you're at the start of a box 
-            metricTotals = []
-            for k in range(i,n-overlap*n, overlap*n): 
-                for m in range(j, n-overlap*n, overlap*n): 
+            metricTotals = len(dictionary[(0,0)])*[0.0]
+            count = 0 
+            for k in range(i,i+n-int(overlap*n)+1, int(overlap*n)): 
+                for m in range(j, j+n-int(overlap*n)+1, int(overlap*n)): 
                     #pull out metrics 
+                #    print (k,m)
                     metrics = dictionary[(k,m)] 
                     #Color average 
+                   # print metricTotals
                     metricTotals = map(add, metricTotals, metrics) 
-            metricAvg = metricTotals/(1/(overlap**2))
-            FinalMetricDict[(i,j)] = metricAvg #fill in a dictionary keyed by upper left coord. of larger square 
+                    count += 1
+          #  metricTotals = numpy.array(metricTotals)
+         #   metricAvg = metricTotals/(1/(overlap**2))
+            print count
+            num = 1/(overlap**2)
+            newMetric = [a/num for a in metricTotals]
+            FinalMetricDict[(i,j)] = newMetric #fill in a dictionary keyed by upper left coord. of larger square 
             #dictionary holds the overall metrics for that square.  
     return FinalMetricDict 
             
