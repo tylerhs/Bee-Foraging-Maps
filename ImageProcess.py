@@ -19,15 +19,57 @@ def getSub(n, imageName):
  #  print(size)
     width = size[0] #pull out length and width 
     length = size[1] 
-    subList = []
+   # subList = []
+   #Initialize lists to hold metric results (for analysis later to test) 
+    avgList = [] 
+    avgTimeL = []
+    yellowList = [] 
+    yellowTimeL = []
+    varList = [] 
+    varTimeL = []
+    edgeList = [] 
+    edgeTimeL = []
+    textList = []
+    textTimeL = []
+    
     # Extract all tiles using a specific overlap (overlap depends on n)
     for i in range(0,width - n+1, int(overlap*n)): #Go through the entire image 
         for j in range(0, length - n+1, int(overlap*n)): 
             box = (i,j,i+n, j+n)  #edge coordinates of the next rectangle. 
             newImage = image.crop(box) #pull out the desired rectangle
-            subList += [newImage] #More efficient way to store each image? 
+            #subList += [newImage] #More efficient way to store each image? 
             ##Add in metric calculations here - don't need to store 
-    return subList #return a list of images (use image.show() to display). 
+            ###TEMPORARY METRIC CALCULATIONS 
+            start = time.time()
+            avg = colorAvg(newImage) 
+            avgTime = time.time() - start 
+            avgTimeL += [avgTime]
+           
+            yellow = findYellowFast(newImage)
+            yellowTime = time.time() - avgTime - start
+            yellowTimeL += [yellowTime]
+         
+            var = colorVariance(newImage) 
+            varTime = time.time() - yellowTime - start
+            varTimeL += [varTime]
+         
+            edges = countEdgePixels(newImage)
+            edgeTime = time.time() - varTime - start
+            edgeTimeL += [edgeTime]
+           
+            texture = textureAnalysis(newImage) 
+            textTime = time.time() - edgeTime - start
+            textTimeL += [textTime]
+      
+            
+            avgList += [avg] 
+            yellowList += [yellow] 
+            varList += [var] 
+            edgeList += [edges]
+            textList += [texture]
+            
+    return avgList, yellowList, varList, edgeList, textList, avgTimeL, yellowTimeL, varTimeL, edgeTimeL, textTimeL
+   ## return subList #return a list of images (use image.show() to display). 
     
 
 #Start of helper functions for computing metrics. 
@@ -144,4 +186,32 @@ def textureAnalysis(imageName):
                 
     # calculate the percentage of high texture grids
     return float(count)/((width/n)*(height/n))
+    
+def findYellowFast(im): 
+    """counts the number of yellow pixels in the given image.""" 
+ #   im = Image.open(imageName)
+    #define HSV value ranges for yellow  
+    #for now just base of Hue - refine for actual yellows seen in field? 
+    minHue = 55/360.
+    maxHue = 70/360.
+    
+    minSat = 0.15 
+   # maxSat = 0.4
+   
+    minV = 0.5
+    
+    
+    width, height = im.size  #find the size of the image 
+    count = 0 #initialize a counter for yellow pixels.  
+    rgbList = list(im.getdata())
+    hsvList = map(getHSV, rgbList)
+    for (h,s,v) in hsvList: 
+        if minHue <h and h<maxHue and minSat<s and minV<v: 
+            count += 1
+    totalPix = width*height 
+    portion = float(count)/totalPix
+    #print(portion)
+    return portion
+def getHSV((r,g,b)): 
+    return rgb_to_hsv(r/255., g/255., b/255.)
             
