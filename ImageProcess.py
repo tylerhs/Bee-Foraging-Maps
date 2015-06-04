@@ -10,17 +10,19 @@ def getSub(n, imageName):
     """Takes in n, an integer less than or equal to the minimum dimension of the image 
        and imageName, the string containing the name of the image to be processed.  
        Returns a list of all nxn subrectangles of image.""" 
+    # define overlap percentage for sub images
+    overlap = 0.1
+       
     image = Image.open(imageName) #load in the image.
     #Find the size of the image. 
     size = image.size
- #   print(size)
+ #  print(size)
     width = size[0] #pull out length and width 
     length = size[1] 
     subList = []
-    #Faster way to do this? Might take awhile when our image is really large (i.e. entire map 
-    #especially with small n values... 
-    for i in range(0,width - n+1, int(0.1*n)): #Go through the entire image 
-        for j in range(0, length - n+1, int(0.1*n)): 
+    # Extract all tiles using a specific overlap (overlap depends on n)
+    for i in range(0,width - n+1, int(overlap*n)): #Go through the entire image 
+        for j in range(0, length - n+1, int(overlap*n)): 
             box = (i,j,i+n, j+n)  #edge coordinates of the next rectangle. 
             newImage = image.crop(box) #pull out the desired rectangle
             subList += [newImage] #More efficient way to store each image? 
