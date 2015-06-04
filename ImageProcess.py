@@ -108,3 +108,38 @@ def countEdgePixels(imageName):
                 pixels += 1
 
     return float(pixels) / (im.size[0]*im.size[1])
+
+def textureAnalysis(imageName):
+    ''' determines the proportion of small grids that have distinct texture'''
+    # define texture threshold and grid size
+    threshold = 100
+    n = 5
+    
+    # open image
+    im = Image.open(imageName)
+    width, height = im.size
+    
+    # loop across image
+    count = 0
+    for i in range(0,width-n,n):
+        for j in range(0,height-n,n):
+            
+            # divide into small grids
+            box = (i,j,i+n,j+n)
+            imTemp = im.crop(box)
+            
+            # calculate intensity from RGB data
+            rImage, gImage, bImage = imTemp.split()
+            rData = list(rImage.getdata())
+            gData = list(rImage.getdata())
+            bData = list(rImage.getdata())
+            intensity =  [rData[i]+gData[i]+bData[i] for i in range(len(rData))]
+            
+            # count as high texture if difference in intensity is 
+            # greater than threshold
+            if ((max(intensity) - min(intensity)) > threshold):
+                count += 1
+                
+    # calculate the percentage of high texture grids
+    return float(count)/((width/n)*(height/n))
+            
