@@ -5,6 +5,7 @@ from PIL import ImageStat
 from colorsys import * 
 import time
 from operator import add
+from sklearn import preprocessing
 #from multiprocessing import Pool
 
 #p = Pool(2)
