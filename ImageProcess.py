@@ -88,41 +88,57 @@ def allMetrics(dictionary,n, im, overlap):
     	for a larger tile of size n, in image im, with overlap percentage im."""
     width, height = im.size 
   #  print dictionary
-    FinalMetricDict = {}
+    #FinalMetricDict = {}
+    numberMetrics = 7 #Change for diff number of metrics as we add more. 
+    overlapSize = int(overlap*n)
+    numberTiles = int((width-n)/(overlapSize)+1)*int(((height-n)/(overlapSize))+1)
+    metricArray = numpy.zeros((numberMetrics, numberTiles))
+    print numberTiles
+    
     for i in range(0,int(width - n), int(overlap*n)): 
         for j in range(0,int(height- n), int(overlap*n)): 
             #you're at the start of a box 
             metricTotals = len(dictionary[(0,0)])*[0.0]
-            count = 0 
+            
+            ##Adding up metrics from small tiles 
             for k in range(i,i+n-int(overlap*n)+1, int(overlap*n)): 
                 for m in range(j, j+n-int(overlap*n)+1, int(overlap*n)): 
                     #pull out metrics 
-                #    print (k,m)
                     metrics = dictionary[(k,m)] 
-                    #Color average 
-                   # print metricTotals
-                    metricTotals = map(add, metricTotals, metrics) 
-                    count += 1
-          #  metricTotals = numpy.array(metricTotals)
-         #   metricAvg = metricTotals/(1/(overlap**2))
-            print count
+                    metricTotals = map(add, metricTotals, metrics)
+            ##Averaging metrics 
             num = 1/(overlap**2)
             newMetric = [a/num for a in metricTotals]
-            FinalMetricDict[(i,j)] = newMetric #fill in a dictionary keyed by upper left coord. of larger square 
-            #dictionary holds the overall metrics for that square.  
-    return FinalMetricDict 
             
-                   
-                    
+            ##Put all metrics metrics in an array. One metric per row. 
+            for index in range(len(metricTotals)): 
+                metricArray[index,(i/(overlap*n) + j*(width-n)/((overlap*n)**2))] = newMetric[index]
+    #        FinalMetricDict[(i,j)] = newMetric #fill in a dictionary keyed by upper left coord. of larger square 
+            #dictionary holds the overall metrics for that square.  
+    return metricArray 
+            
+
                 
 def calcMetrics(imageName, tileSize, overlap): 
     """wrapper function to calculate metrics for each tile of the image.
-        returns a dictionary containing metric vectors keyed by (i,j) coordinates 
-        of the upper left hand of the tile desired.""" 
+        returns an array containing metric vectors in order by coordinates 
+        of the upper left hand of the tile desired. Also returns a scalar object 
+        for scaling future input data. """ 
     im = Image.open(imageName)
     subDict = getSub(tileSize, imageName) 
     finalMetrics = allMetrics(subDict, tileSize, im, overlap) 
-    return finalMetrics
+    scaled = scaleMetrics(finalMetrics) ##Scale input data 
+    return scaled
+    
+def scaleMetrics(metricArray): 
+    """Takes in a dictionary of metrics, scales them to have 
+        mean 0 and stdev 1. returns both the metrics and the scaler object 
+        which can be used to transform later data. """ 
+        
+    #First put all metrics into arrays with one metric 
+    scaler = preprocessing.StandardScaler().fit(metricArray)
+    scaledArray = scaler.transform(metricArray) 
+    return scaledArray, scaler 
 
 
 #Start of helper functions for computing metrics. 
