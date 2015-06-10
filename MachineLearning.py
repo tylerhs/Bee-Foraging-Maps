@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 
 def svrAlg(): 
+    """Runs a Support Vector Regression Algorithm on X, an array of metrics 
+        and densities, the corresponding densities. Note that X and densities should be updated 
+        with actual field data collected."""
     X = [[0, 0], [2, 2]] #X is the array of metrics 
 
     densities = [0.5, 2.5] #densities are the measured densities 
@@ -21,6 +24,8 @@ def svrAlg():
     
     ##Number of tiles in one row (width-n)/(overlapSize)+1)
 def densMap(fit, metricArray, n, overlap, imageSize ): 
+    """Creates and saves a contour plot of densities based on an 
+        input fit function, metrics, and image size characteristics."""
     densities = fit.predict(metricArray)
     
     width = imageSize[0] 
@@ -66,20 +71,31 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     fig = plt.contourf( data)
     
     plt.clabel(fig, inline=1, fontsize=10)
-    plt.title('New plot!!!')
+    plt.title('ContourPlot!!!')
     
  #   plt.imshow(plt.contourf(data))
     
     plt.savefig('ContourPlot.jpg')
     
 def overlayMap(mapName, contourName): 
+    """Overlays the images of a contour map and the original aerial map. Saves the output.
+    Note that the contour plot must be cropped to only include the contour image before 
+    running this. """
     mapIm = Image.open(mapName) 
     contour = Image.open(contourName)
   #  contour.convert('RGBA')
    # contour.putalpha(30)
     plt.imshow(contour)
     mapIm.convert('RGBA')
-    mapIm.putalpha(150)
+    mapIm.putalpha(150) #higher number = darker image. Max = 255
     plt.imshow(mapIm)
     
     plt.savefig('OverlayMap.jpg')
+    
+    
+def learnSVR(): 
+    """A wrapper function for the machine learning algorithm and post-processing.""" 
+    fit = svrAlg() 
+    densMap(fit, metricArray, n, overlap, imageSize )
+    overlayMap('SmallTile.jpg', 'ContourPlot.jpg') 
+    # Final map is saved as OverlayMap.jpg
