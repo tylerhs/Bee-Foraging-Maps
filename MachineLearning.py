@@ -28,8 +28,7 @@ def gaussReg():
     
     gp = GaussianProcess(corr='squared_exponential', theta0=1e-1,
                      thetaL=1e-3, thetaU=1,
-                     nugget=(dy / y) ** 2,
-                     random_start=100)               
+                     random_start=100)    #Change these parameters to get better fit...            
     gp.fit(metrics, densities)
     return gp
 
@@ -105,9 +104,25 @@ def overlayMap(mapName, contourName):
     plt.savefig('OverlayMap.jpg')
     
     
-def learnSVR(): 
+def learnSVR(metricArray): 
     """A wrapper function for the machine learning algorithm and post-processing.""" 
     fit = svrAlg() 
+    n= 100 
+    overlap = 0.1 
+    imageSize = [100,400]
+    
     densMap(fit, metricArray, n, overlap, imageSize )
     overlayMap('SmallTile.jpg', 'ContourPlot.jpg') 
     # Final map is saved as OverlayMap.jpg
+    
+    
+def learnGauss(metricArray): 
+    """A wrapper function for the Gaussian machine learning algorithm and post-processing.""" 
+    fit = gaussReg() 
+    n= 100 
+    overlap = 0.1 
+    imageSize = [100,400]
+    densMap(fit, metricArray, n, overlap, imageSize )
+    overlayMap('SmallTile.jpg', 'ContourPlot.jpg') 
+    # Final map is saved as OverlayMap.jpg
+    
