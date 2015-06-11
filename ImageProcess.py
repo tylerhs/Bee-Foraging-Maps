@@ -125,14 +125,24 @@ def calcMetrics(imageName, tileSize, overlap):
         returns an array containing metric vectors in order by coordinates 
         of the upper left hand of the tile desired. Also returns a scalar object 
         for scaling future input data. """ 
+        
+    NUMBERMETRICS = 7
     im = Image.open(imageName)
     subDict = getSub(tileSize, imageName) 
     finalMetrics = allMetrics(subDict, tileSize, im, overlap) 
-    scaled = scaleMetrics(finalMetrics) ##Scale input data 
-    return scaled
+    scaled, scaler = scaleMetrics(finalMetrics) ##Scale input data 
+    totalSize = scaled.size 
+    numCols = totalSize/NUMBERMETRICS 
+    scaledMetrics = []
+    for i in range(numCols):
+        currentMetric = [] 
+        for metric in range(NUMBERMETRICS): 
+            currentMetric += [scaled[metric, i]] 
+        scaledMetrics += [currentMetric]
+    return scaledMetrics, scaler
     
 def scaleMetrics(metricArray): 
-    """Takes in a dictionary of metrics, scales them to have 
+    """Takes in a array of metrics, scales them to have 
         mean 0 and stdev 1. returns both the metrics and the scaler object 
         which can be used to transform later data. """ 
         
