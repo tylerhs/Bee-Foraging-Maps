@@ -1,12 +1,12 @@
 from sklearn.svm import SVR
 import numpy
 from PIL import Image
- 
 import matplotlib
 import matplotlib.cm as cm
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
+from sklearn.gaussian_process import GaussianProcess
 
 def svrAlg(): 
     """Runs a Support Vector Regression Algorithm on X, an array of metrics 
@@ -22,6 +22,18 @@ def svrAlg():
 
     return clf
     
+def gaussReg(): 
+    metrics = [[0, 0], [2, 2]]
+    densities =  [0.5, 2.5] 
+    
+    gp = GaussianProcess(corr='squared_exponential', theta0=1e-1,
+                     thetaL=1e-3, thetaU=1,
+                     nugget=(dy / y) ** 2,
+                     random_start=100)               
+    gp.fit(metrics, densities)
+    return gp
+
+
     ##Number of tiles in one row (width-n)/(overlapSize)+1)
 def densMap(fit, metricArray, n, overlap, imageSize ): 
     """Creates and saves a contour plot of densities based on an 
