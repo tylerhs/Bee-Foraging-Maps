@@ -70,7 +70,7 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     
     data = griddata(points, densities, (grid_x, grid_y), method = 'cubic') #interpolate to get continuous function of points 
     #can change interpolation method
-    x = numpy.arange(0, width, 1)
+    x = numpy.arange(0, width, 1) #probably won't actually need to use this part...
     y = numpy.arange(0, height, 1)
     X, Y = numpy.meshgrid(x,y)
     
@@ -97,9 +97,9 @@ def overlayMap(mapName, contourName):
   #  contour.convert('RGBA')
    # contour.putalpha(30)
     plt.imshow(contour)
-    mapIm.convert('RGBA')
+    mapIm.convert('RGBA') #Add a transparency layer to the image
     mapIm.putalpha(150) #higher number = darker image. Max = 255
-    plt.imshow(mapIm)
+    plt.imshow(mapIm) #Plot the overlaid map
     
     plt.savefig('OverlayMap.jpg')
     
@@ -107,7 +107,7 @@ def overlayMap(mapName, contourName):
 def learnSVR(metricArray): 
     """A wrapper function for the machine learning algorithm and post-processing.""" 
     fit = svrAlg() 
-    n= 100 
+    n= 100  #Change your metrics here!!!!!!!!!
     overlap = 0.1 
     imageSize = [100,400]
     
@@ -119,7 +119,7 @@ def learnSVR(metricArray):
 def learnGauss(metricArray): 
     """A wrapper function for the Gaussian machine learning algorithm and post-processing.""" 
     fit = gaussReg() 
-    n= 100 
+    n= 100  #You should probably change this...
     overlap = 0.1 
     imageSize = [100,400]
     densMap(fit, metricArray, n, overlap, imageSize )
