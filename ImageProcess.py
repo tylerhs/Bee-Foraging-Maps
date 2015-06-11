@@ -6,7 +6,7 @@ from colorsys import *
 import time
 from operator import add
 from sklearn import preprocessing
-#from multiprocessing import Pool
+#from multiprocessing import Pool   ##Hopefully figure this out - used for multithreading 
 
 #p = Pool(2)
 
@@ -48,27 +48,27 @@ def getSub(n, imageName):
             ##Add in metric calculations here - don't need to store 
             
             
-            ###TEMPORARY METRIC CALCULATIONS 
-            start = time.time()
+            ### METRIC CALCULATIONS - Time counters commented out for now. 
+           # start = time.time()
             avg = colorAvg(newImage) 
-            avgTime = time.time() - start 
-            avgTimeL += [avgTime]
+          #  avgTime = time.time() - start 
+           # avgTimeL += [avgTime]
            
             yellow = findYellowFast(newImage)
-            yellowTime = time.time() - avgTime - start
-            yellowTimeL += [yellowTime]
+            #yellowTime = time.time() - avgTime - start
+            #yellowTimeL += [yellowTime]
          
             var = colorVariance(newImage) 
-            varTime = time.time() - yellowTime - start
-            varTimeL += [varTime]
+            #varTime = time.time() - yellowTime - start
+            #varTimeL += [varTime]
          
             edges = countEdgePixels(newImage)
-            edgeTime = time.time() - varTime - start
-            edgeTimeL += [edgeTime]
+            #edgeTime = time.time() - varTime - start
+            #edgeTimeL += [edgeTime]
            
             texture = textureAnalysis(newImage) 
-            textTime = time.time() - edgeTime - start
-            textTimeL += [textTime]
+            #textTime = time.time() - edgeTime - start
+            #textTimeL += [textTime]
       
             
             avgList += [avg] 
@@ -128,18 +128,18 @@ def calcMetrics(imageName, tileSize, overlap):
         
     NUMBERMETRICS = 7
     im = Image.open(imageName)
-    subDict = getSub(tileSize, imageName) 
-    finalMetrics = allMetrics(subDict, tileSize, im, overlap) 
-    scaled, scaler = scaleMetrics(finalMetrics) ##Scale input data 
-    totalSize = scaled.size 
-    numCols = totalSize/NUMBERMETRICS 
+    subDict = getSub(tileSize, imageName)  #Get a dictionary of metrics for small tiles
+    finalMetrics = allMetrics(subDict, tileSize, im, overlap) #calculate metrics on larger tiles  
+    scaled, scaler = scaleMetrics(finalMetrics) ##Scale metrics 
+    totalSize = scaled.size #Find the size of this scaled metric array
+    numCols = totalSize/NUMBERMETRICS  #Find the number of tiles =number of cols
     scaledMetrics = []
     for i in range(numCols): ##Change output into a list of lists 
         currentMetric = [] 
         for metric in range(NUMBERMETRICS): 
             currentMetric += [scaled[metric, i]] 
         scaledMetrics += [currentMetric]
-    return scaledMetrics, scaler
+    return scaledMetrics, scaler #return the scaledmetrics and the scaler for later use...
     
 def scaleMetrics(metricArray): 
     """Takes in a array of metrics, scales them to have 
@@ -167,7 +167,7 @@ def colorAvg(im):
   #rgb_to_hsv(r/255.,g/255.,b/255.)  converts pixel coords to HSV coords 
   
    
-def findYellow(im): 
+def findYellow(im):  #Use the fast version! (findYellowFast(im))
     """counts the number of yellow pixels in the given image.""" 
     #im = Image.open(imageName)
     pix = im.load() #load in pixel array  
