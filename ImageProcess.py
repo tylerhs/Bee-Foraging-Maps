@@ -134,7 +134,7 @@ def calcMetrics(imageName, tileSize, overlap):
     totalSize = scaled.size 
     numCols = totalSize/NUMBERMETRICS 
     scaledMetrics = []
-    for i in range(numCols):
+    for i in range(numCols): ##Change output into a list of lists 
         currentMetric = [] 
         for metric in range(NUMBERMETRICS): 
             currentMetric += [scaled[metric, i]] 
