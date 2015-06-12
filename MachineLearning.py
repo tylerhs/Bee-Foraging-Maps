@@ -37,7 +37,12 @@ def gaussReg():
 def densMap(fit, metricArray, n, overlap, imageSize ): 
     """Creates and saves a contour plot of densities based on an 
         input fit function, metrics, and image size characteristics."""
-    densities = fit.predict(metricArray) #Use the ML fit to predict the density for each tile 
+    if type(fit)==sklearn.gaussian_process.gaussian_process.GaussianProcess: #If the fit is Gaussian
+        densities, MSE = fit.predict(metricArray, eval_MSE =True)
+        sigma = numpy.sqrt(MSE)
+        print sigma
+    else:
+        densities = fit.predict(metricArray) #Use the ML fit to predict the density for each tile 
     
     width = imageSize[0] 
     height = imageSize[1] 
