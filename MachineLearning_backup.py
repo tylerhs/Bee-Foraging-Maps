@@ -7,6 +7,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 from sklearn.gaussian_process import GaussianProcess
+import sklearn
 
 def svrAlg(): 
     """Runs a Support Vector Regression Algorithm on X, an array of metrics 
@@ -23,8 +24,8 @@ def svrAlg():
     return clf
     
 def gaussReg(): 
-    metrics = [[0, 0], [2, 2]]
-    densities =  [0.5, 2.5] 
+    metrics = [[0, 0], [2, 2]] #List of lists of metrics calculated 
+    densities =  [0.5, 2.5] #The corresponding densities 
     
     gp = GaussianProcess(corr='squared_exponential', theta0=1e-1,
                      thetaL=1e-3, thetaU=1,
@@ -37,16 +38,12 @@ def gaussReg():
 def densMap(fit, metricArray, n, overlap, imageSize ): 
     """Creates and saves a contour plot of densities based on an 
         input fit function, metrics, and image size characteristics."""
-<<<<<<< HEAD
     if type(fit)==sklearn.gaussian_process.gaussian_process.GaussianProcess: #If the fit is Gaussian
         densities, MSE = fit.predict(metricArray, eval_MSE =True)
         sigma = numpy.sqrt(MSE)
         print sigma
     else:
         densities = fit.predict(metricArray) #Use the ML fit to predict the density for each tile 
-=======
-    densities = fit.predict(metricArray)
->>>>>>> parent of eeeeb83... Update MachineLearning.py
     
     width = imageSize[0] 
     height = imageSize[1] 
@@ -63,29 +60,23 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     for i in range(len(densities)): 
        # newArray[i%(rowTiles),i/(rowTiles)] = densities[i]
       # newArray[(i%(rowTiles)+1)*(n/2) , (i/(rowTiles)+1)*(n/2)] = densities[i]
-       points += [[(i%(rowTiles)+1)*(n/2), (i/(rowTiles)+1)*(n/2)]]
+       points += [[(i%(rowTiles)+1)*(n/2), (i/(rowTiles)+1)*(n/2)]] #Consider the density to be at the center of each tile 
          
          
          
     grid_x, grid_y = numpy.mgrid[0:width, 0:height]  #create a meshgrid  
     
-    print grid_x
-    print grid_y
+    #print grid_x #Debugging print statements to check grid size 
+    #print grid_y
     
     #points = [] #create a list of where the points are 
     
     #values in the example is densities 
     
     
-<<<<<<< HEAD
     data = griddata(points, densities, (grid_x, grid_y), method = 'cubic') #interpolate to get continuous function of points 
     #can change interpolation method
     x = numpy.arange(0, width, 1) #probably won't actually need to use this part...
-=======
-    data = griddata(points, densities, (grid_x, grid_y), method = 'cubic') #interpolate to find all points 
-    
-    x = numpy.arange(0, width, 1)
->>>>>>> parent of eeeeb83... Update MachineLearning.py
     y = numpy.arange(0, height, 1)
     X, Y = numpy.meshgrid(x,y)
     
