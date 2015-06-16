@@ -12,12 +12,12 @@ from sklearn import preprocessing
 
 
 #Extract all nxn rectangles from an image (these will be processed then used as inputs for ML algorithm). 
-def getSub(n, imageName): 
+def getSub(n, imageName, overlap): 
     """Takes in n, an integer less than or equal to the minimum dimension of the image 
        and imageName, the string containing the name of the image to be processed.  
        Returns a list of all nxn subrectangles of image.""" 
     # define overlap percentage for sub images
-    overlap = 0.1
+   # overlap = 0.1
        
     image = Image.open(imageName) #load in the image.
     #Find the size of the image. 
@@ -28,15 +28,15 @@ def getSub(n, imageName):
    # subList = []
    #Initialize lists to hold metric results (for analysis later to test) 
     avgList = [] 
-    avgTimeL = []
+  #  avgTimeL = []
     yellowList = [] 
-    yellowTimeL = []
+   # yellowTimeL = []
     varList = [] 
-    varTimeL = []
+    #varTimeL = []
     edgeList = [] 
-    edgeTimeL = []
+    #edgeTimeL = []
     textList = []
-    textTimeL = []
+    #textTimeL = []
     
     MetricDict = {} #initialize empty dict. 
     # Extract all tiles using a specific overlap (overlap depends on n)
@@ -94,7 +94,7 @@ def allMetrics(dictionary,n, im, overlap):
     overlapSize = int(overlap*n)
     numberTiles = int((width-n)/(overlapSize)+1)*int(((height-n)/(overlapSize))+1)
     metricArray = numpy.zeros((numberMetrics, numberTiles))
-    print numberTiles
+    #print numberTiles
     
     for i in range(0,int(width - n), int(overlap*n)): 
         for j in range(0,int(height- n), int(overlap*n)): 
@@ -128,18 +128,18 @@ def calcMetrics(imageName, tileSize, overlap):
         
     NUMBERMETRICS = 7
     im = Image.open(imageName)
-    subDict = getSub(tileSize, imageName)  #Get a dictionary of metrics for small tiles
+    subDict = getSub(tileSize, imageName, overlap)  #Get a dictionary of metrics for small tiles
     finalMetrics = allMetrics(subDict, tileSize, im, overlap) #calculate metrics on larger tiles  
-    scaled, scaler = scaleMetrics(finalMetrics) ##Scale metrics 
-    totalSize = scaled.size #Find the size of this scaled metric array
+    #scaled, scaler = scaleMetrics(finalMetrics) ##Scale metrics 
+    totalSize = finalMetrics.size #Find the size of this scaled metric array
     numCols = totalSize/NUMBERMETRICS  #Find the number of tiles =number of cols
     scaledMetrics = []
     for i in range(numCols): ##Change output into a list of lists 
         currentMetric = [] 
         for metric in range(NUMBERMETRICS): 
-            currentMetric += [scaled[metric, i]] 
+            currentMetric += [finalMetrics[metric, i]] 
         scaledMetrics += [currentMetric]
-    return scaledMetrics, scaler #return the scaledmetrics and the scaler for later use...
+    return scaledMetrics #return the scaledmetrics and the scaler for later use...
     
 def scaleMetrics(metricArray): 
     """Takes in a array of metrics, scales them to have 
@@ -151,7 +151,30 @@ def scaleMetrics(metricArray):
     scaledArray = scaler.transform(metricArray) 
     return scaledArray, scaler 
 
+######TRAINING SET CALCULATIONS#########################
 
+def trainMetrics(imageName, density): 
+    image = Image.open(imageName) 
+    avg = colorAvg(image) 
+    yellow = findYellowFast(image) 
+    edges = countEdgePixels(image) 
+    var = colorVariance(image) 
+    texture = textureAnalysis(image) 
+    
+    metrics = [avg[0], avg[1], avg[2], yellow, var, edges, texture] 
+    return [metrics, density] 
+    
+def allTrainMetrics(imageList, densityList): 
+    metricsList = []
+    for i in range(len(imageList)): 
+        imageName = imageList[i]
+        #currentIm = Image.open(imageName) 
+        [metrics, density] = trainMetrics(imageName, densityList[i]) 
+        metricsList += [metrics] 
+    return metricsList, densityList
+    
+      
+          
 #Start of helper functions for computing metrics. 
     
 def colorAvg(im): 
