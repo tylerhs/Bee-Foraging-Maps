@@ -19,7 +19,7 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     image = Image.open(imageName)
     imageSize = image.size
     
-    imageList = makePicList(10)
+    imageList = makePicList(7)
     ####STep 1: Calculate Training Metrics 
     
     metricList, densityList = allTrainMetrics(imageList, densityList)
@@ -52,7 +52,7 @@ def makePicList(numSites):
     """makes an image name list for a given number of sites.""" 
     nameList = []
     for i in range(numSites): #for each site 
-        currentName = str(i)+".jpg" 
+        currentName = str(i+1)+".jpg" 
         nameList += [currentName]
     return nameList
         
