@@ -14,11 +14,14 @@ def main():
     
     
     
-def totalSVR(imageList, densityList, imageName,tileSize, overlap): 
+def totalSVR(densityList, imageName,tileSize, overlap): 
     """Does a complete run of the SVR learning algorithm. Takes in a training set of data."""
     image = Image.open(imageName)
     imageSize = image.size
+    
+    imageList = makePicList(10)
     ####STep 1: Calculate Training Metrics 
+    
     metricList, densityList = allTrainMetrics(imageList, densityList)
     
     
@@ -45,7 +48,14 @@ def totalSVR(imageList, densityList, imageName,tileSize, overlap):
     plt.close('all')
     overlayMap(imageName, 'ContourPlot.jpg') 
     
-    
+def makePicList(numSites): 
+    """makes an image name list for a given number of sites.""" 
+    nameList = []
+    for i in range(numSites): #for each site 
+        currentName = str(i)+".jpg" 
+        nameList += [currentName]
+    return nameList
+        
 #if __name__ == "__main__":
     
     #totalSVR(['SuperSmallTile.jpg'], [0.5], 'SmallTile.jpg', 75, 0.5)
