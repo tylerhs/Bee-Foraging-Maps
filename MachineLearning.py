@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 from sklearn.gaussian_process import GaussianProcess
 import sklearn
+import OpenGL
 
 def svrAlg(X, densities): 
     """Runs a Support Vector Regression Algorithm on X, an array of metrics 
@@ -69,7 +70,7 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     grid_x, grid_y = numpy.mgrid[0:width, 0:height]  #create a meshgrid  
 
 
-    print 'At line 72 in densMap'
+   # print 'At line 72 in densMap'
     #print grid_x #Debugging print statements to check grid size 
     #print grid_y
     
@@ -81,6 +82,9 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
    # print('Densities is ', densities)
     data = griddata(points, densities, (grid_x, grid_y), method = 'cubic') #interpolate to get continuous function of points 
     #can change interpolation method
+    
+    print data 
+    
     x = numpy.arange(0, width, 1) #probably won't actually need to use this part...
     y = numpy.arange(0, height, 1)
     X, Y = numpy.meshgrid(x,y)
@@ -92,7 +96,15 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     
     #plt.figure(figsize = (width, height))
   #  print "Hi Cassie"
-    fig = plt.contourf(grid_x, grid_y, data, levels=[-2,-1,0,1,2])
+    fig = plt.contourf(grid_x, grid_y, data, alpha = 0.2)
+    
+    mapIm = Image.open('FirstStitchSmall.jpeg')
+    plt.imshow(mapIm)
+    
+    plt.colorbar()
+    
+    #set(fig, 'Renderer', 'OpenGL')
+    
     
    # print 'At line 95 in densMap'
     #plt.clabel(fig, inline=1, fontsize=10)
@@ -103,8 +115,7 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     
     plt.savefig('ContourPlot.jpg')
     
-    
-    plt.close()
+  #  plt.close()
     
 def overlayMap(mapName, contourName): 
     """Overlays the images of a contour map and the original aerial map. Saves the output.
