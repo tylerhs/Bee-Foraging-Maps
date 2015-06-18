@@ -1,8 +1,8 @@
 from ImageProcess import * 
 from MachineLearning import *
-import os
 
-def main(): 
+
+def main():  #we never use this now. 
     imageName = 'SmallTile.jpg'
     tileSize = 50 
     
@@ -15,7 +15,8 @@ def main():
     
     
 def totalSVR(densityList, imageName,tileSize, overlap): 
-    """Does a complete run of the SVR learning algorithm. Takes in a training set of data."""
+    """Does a complete run of the SVR learning algorithm. Takes in a training set of density
+        data, an imageName in a string, the size of tile desired and an overlap as a percentage."""
     image = Image.open(imageName)
     imageSize = image.size
     
@@ -41,6 +42,9 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     #Scale the metrics 
     scaledMetrics = scaler.transform(imageMetrics) ##These are the final metrics on the full image
     #print 'scaled metrics'
+    
+ 
+    
     
     print 'Image metrics computed'
     

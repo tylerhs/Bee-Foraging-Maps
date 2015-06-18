@@ -78,12 +78,19 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     
     #values in the example is densities 
     
+        
+
+    
   #  print('Points is ', points) 
    # print('Densities is ', densities)
     data = griddata(points, densities, (grid_x, grid_y), method = 'cubic') #interpolate to get continuous function of points 
     #can change interpolation method
     
-    print data 
+
+    print numpy.amax(data)
+   # min_max_scaler = sklearn.preprocessing.MinMaxScaler()
+    #data_minmax = min_max_scaler.fit_transform(data) 
+    
     
     x = numpy.arange(0, width, 1) #probably won't actually need to use this part...
     y = numpy.arange(0, height, 1)
@@ -96,13 +103,17 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     
     #plt.figure(figsize = (width, height))
   #  print "Hi Cassie"
-    fig = plt.contourf(grid_x, grid_y, data, alpha = 0.2)
+    v = numpy.linspace(min(densities), max(densities), 200, endpoint=True)
+    fig = plt.contourf(grid_x, grid_y, data, levels = v, alpha = 0.2)
     
     mapIm = Image.open('FirstStitchSmall.jpeg')
     plt.imshow(mapIm)
-    
-    plt.colorbar()
-    
+    maxDens = max(densities)
+    print maxDens
+   # plt.colorbar()    
+    x = plt.colorbar(fig)
+
+
     #set(fig, 'Renderer', 'OpenGL')
     
     
