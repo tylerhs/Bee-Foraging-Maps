@@ -24,9 +24,9 @@ def svrAlg(X, densities):
 
     return clf
     
-def gaussReg(): 
-    metrics = [[0, 0], [2, 2]] #List of lists of metrics calculated 
-    densities =  [0.5, 2.5] #The corresponding densities 
+def gaussReg(metrics, densities): 
+  #  metrics = [[0, 0], [2, 2]] #List of lists of metrics calculated 
+   # densities =  [0.5, 2.5] #The corresponding densities 
     
     gp = GaussianProcess(corr='squared_exponential', theta0=1e-1,
                      thetaL=1e-3, thetaU=1,
