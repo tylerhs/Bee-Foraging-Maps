@@ -70,10 +70,6 @@ def densMap(fit, metricArray, n, overlap, imageSize, imageName ):
 
     grid_x, grid_y = numpy.mgrid[0:width, 0:height]  #create a meshgrid 
      
-
-    print points
-    raw_input('Wheeeeee')
-    
    # print 'At line 72 in densMap'
     #print grid_x #Debugging print statements to check grid size 
     #print grid_y

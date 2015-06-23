@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from ImageProcess import * 
 from MachineLearning import *
 
@@ -48,9 +49,9 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     print 'Image metrics computed'
     
     #learnSVR(scaledMetrics, tileSize, overlap, imageSize, fit)
-    densMap(fit, scaledMetrics, tileSize, overlap, imageSize, imageName ) 
+    densities = densMap(fit, scaledMetrics, tileSize, overlap, imageSize, imageName ) 
 
-   # print 'Completed density map'
+    numpy.savetxt("densities.csv", densities, delimiter=",",  fmt= '%.4f')   # print 'Completed density map'
     
    # raw_input("Please crop the contour plot. Press return to continue.")
   #  plt.close('all')
