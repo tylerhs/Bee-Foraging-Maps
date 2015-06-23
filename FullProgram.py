@@ -17,39 +17,38 @@ def main():  #we never use this now.
 def totalSVR(densityList, imageName,tileSize, overlap): 
     """Does a complete run of the SVR learning algorithm. Takes in a training set of density
         data, an imageName in a string, the size of tile desired and an overlap as a percentage."""
-    image = Image.open(imageName)
-    imageSize = image.size
+    image = Image.open(imageName) #open the image
+    imageSize = image.size #get the image size 
     
-    imageList = makePicList(7)
+    imageList = makePicList(7) #Make a list of picture names, numbered by site number '1.jpg' etc. 
     ####STep 1: Calculate Training Metrics 
     
-    metricList, densityList = allTrainMetrics(imageList, densityList)
+    metricList, densityList = allTrainMetrics(imageList, densityList) #Compute the metrics on each training image 
     
-    print 'Training metrics computed'
+    print 'Training metrics computed' 
     
     ##Step 1: Scale the incoming training data 
     
-    scaledTraining, scaler = scaleMetrics(metricList) 
+    scaledTraining, scaler = scaleMetrics(metricList)  #Scale the training metrics to mean 0 and std 1 
     
     ### Train the machine learning algorithm 
-    fit = svrAlg(scaledTraining, densityList) 
+    fit = svrAlg(scaledTraining, densityList)  #fit the algorithm 
     
     print 'Machine Learning done'
     
     ###Calculate metrics on full image 
     
-    imageMetrics = calcMetrics(imageName, tileSize, overlap)
+    imageMetrics = calcMetrics(imageName, tileSize, overlap) #calculate the image metrics on the full image
     #Scale the metrics 
-    scaledMetrics = scaler.transform(imageMetrics) ##These are the final metrics on the full image
+    scaledMetrics = scaler.transform(imageMetrics) ##These are the final metrics on the full image - scaled the same as the training metrics 
     #print 'scaled metrics'
     
- 
-    
+
     
     print 'Image metrics computed'
     
     #learnSVR(scaledMetrics, tileSize, overlap, imageSize, fit)
-    densMap(fit, scaledMetrics, tileSize, overlap, imageSize ) 
+    densMap(fit, scaledMetrics, tileSize, overlap, imageSize, imageName ) 
 
    # print 'Completed density map'
     
@@ -89,13 +88,16 @@ def totalGauss(densityList, imageName,tileSize, overlap):
     print 'Image metrics computed'
     
     #learnSVR(scaledMetrics, tileSize, overlap, imageSize, fit)
-    densMap(fit, scaledMetrics, tileSize, overlap, imageSize ) 
+    results = densMap(fit, scaledMetrics, tileSize, overlap, imageSize, imageName ) 
 
    # print 'Completed density map'
     
    # raw_input("Please crop the contour plot. Press return to continue.")
   #  plt.close('all')
+  
    # overlayMap(imageName, 'ContourPlot.jpg') 
+   
+    return results
     
 def makePicList(numSites): 
     """makes an image name list for a given number of sites.""" 

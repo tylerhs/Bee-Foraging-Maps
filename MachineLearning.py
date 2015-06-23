@@ -10,6 +10,7 @@ from sklearn.gaussian_process import GaussianProcess
 import sklearn
 import OpenGL
 
+
 def svrAlg(X, densities): 
     """Runs a Support Vector Regression Algorithm on X, an array of metrics 
         and densities, the corresponding densities. Note that X and densities should be updated 
@@ -36,7 +37,7 @@ def gaussReg(metrics, densities):
 
 
     ##Number of tiles in one row (width-n)/(overlapSize)+1)
-def densMap(fit, metricArray, n, overlap, imageSize ): 
+def densMap(fit, metricArray, n, overlap, imageSize, imageName ): 
     """Creates and saves a contour plot of densities based on an 
         input fit function, metrics, and image size characteristics."""
     if type(fit)==sklearn.gaussian_process.gaussian_process.GaussianProcess: #If the fit is Gaussian
@@ -62,14 +63,17 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     #print newArray
     points = []
     for i in range(len(densities)):
-        points += [[(i%rowTiles)*overlapSize + n/2, (i/rowTiles)*overlapSize + n/2]]
+        points += [[(i%rowTiles)*overlapSize + n/2 , (i/rowTiles)*overlapSize + n/2]]
        # newArray[i%(rowTiles),i/(rowTiles)] = densities[i]
       # newArray[(i%(rowTiles)+1)*(n/2) , (i/(rowTiles)+1)*(n/2)] = densities[i]
       # points += [[(i%(rowTiles)+1)*(n/2), (i/(rowTiles)+1)*(n/2)]] #Consider the density to be at the center of each tile 
 
-    grid_x, grid_y = numpy.mgrid[0:width, 0:height]  #create a meshgrid  
+    grid_x, grid_y = numpy.mgrid[0:width, 0:height]  #create a meshgrid 
+     
 
-
+    print points
+    raw_input('Wheeeeee')
+    
    # print 'At line 72 in densMap'
     #print grid_x #Debugging print statements to check grid size 
     #print grid_y
@@ -83,7 +87,7 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     
   #  print('Points is ', points) 
    # print('Densities is ', densities)
-    data = griddata(points, densities, (grid_x, grid_y), method = 'cubic') #interpolate to get continuous function of points 
+    data = griddata(points, densities, (grid_x, grid_y), method = 'linear') #interpolate to get continuous function of points 
     #can change interpolation method
     
 
@@ -92,9 +96,9 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     #data_minmax = min_max_scaler.fit_transform(data) 
     
     
-    x = numpy.arange(0, width, 1) #probably won't actually need to use this part...
-    y = numpy.arange(0, height, 1)
-    X, Y = numpy.meshgrid(x,y)
+   # x = numpy.arange(0, width, 1) #probably won't actually need to use this part...
+   # y = numpy.arange(0, height, 1)
+   # X, Y = numpy.meshgrid(x,y)
     
   #  print 'At line 88 in densMap' 
     ##Plotting 
@@ -104,9 +108,9 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     #plt.figure(figsize = (width, height))
   #  print "Hi Cassie"
     v = numpy.linspace(min(densities), max(densities), 200, endpoint=True)
-    fig = plt.contourf(grid_x, grid_y, data, levels = v, alpha = 0.2)
+    fig = plt.contourf(grid_x, grid_y, data, levels = v, alpha = 0.2, antialiased = True)
     
-    mapIm = Image.open('FirstStitchSmall.jpeg')
+    mapIm = Image.open(imageName)
     plt.imshow(mapIm)
     maxDens = max(densities)
     print maxDens
@@ -126,6 +130,7 @@ def densMap(fit, metricArray, n, overlap, imageSize ):
     
     plt.savefig('ContourPlot.jpg')
     
+    return data
   #  plt.close()
     
 def overlayMap(mapName, contourName): 

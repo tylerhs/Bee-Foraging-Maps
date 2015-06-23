@@ -6,9 +6,9 @@ from colorsys import *
 import time
 from operator import add
 from sklearn import preprocessing
+from skimage import data
 #from multiprocessing import Pool   ##Hopefully figure this out - used for multithreading 
 
-#p = Pool(2)
 
 
 #Extract all nxn rectangles from an image (these will be processed then used as inputs for ML algorithm). 
@@ -292,13 +292,13 @@ def findYellowFast(im):
  #   im = Image.open(imageName)
     #define HSV value ranges for yellow  
     #for now just base of Hue - refine for actual yellows seen in field? 
-    minHue = 55/360.
-    maxHue = 70/360.
+    minHue = 43/360.
+    maxHue = 49/360.
     
-    minSat = 0.15 
+    minSat = 80/360. 
    # maxSat = 0.4
    
-    minV = 0.5
+    minV = 70/360.
     
     width, height = im.size  #find the size of the image 
     count = 0 #initialize a counter for yellow pixels.  
