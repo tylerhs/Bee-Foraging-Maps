@@ -9,16 +9,12 @@ from sklearn import preprocessing
 from skimage import data
 #from multiprocessing import Pool   ##Hopefully figure this out - used for multithreading 
 
-
-
 #Extract all nxn rectangles from an image (these will be processed then used as inputs for ML algorithm). 
 def getSub(n, imageName, overlap): 
     """Takes in n, an integer less than or equal to the minimum dimension of the image 
        and imageName, the string containing the name of the image to be processed.  
        Returns a list of all nxn subrectangles of image.""" 
-    # define overlap percentage for sub images
-   # overlap = 0.1
-       
+    # define overlap percentage for sub images        
     image = Image.open(imageName) #load in the image.
     #Find the size of the image. 
     size = image.size
@@ -38,11 +34,13 @@ def getSub(n, imageName, overlap):
     textList = []
     #textTimeL = []
     
+    smallTileSize = int(overlap*n)
+    
     MetricDict = {} #initialize empty dict. 
     # Extract all tiles using a specific overlap (overlap depends on n)
-    for i in range(0,int(width - overlap*n), int(overlap*n)): #Go through the entire image 
-        for j in range(0, int(length - overlap*n), int(overlap*n)): 
-            box = (i,j,i+n, j+n)  #edge coordinates of the next rectangle. 
+    for i in range(0,width -int( overlap*n), int(overlap*n)): #Go through the entire image 
+        for j in range(0, length - int(overlap*n), int(overlap*n)): 
+            box = (i,j,i+smallTileSize, j+smallTileSize)  #edge coordinates of the next rectangle. 
             newImage = image.crop(box) #pull out the desired rectangle
         #    subList += [newImage] #More efficient way to store each image? 
             ##Add in metric calculations here - don't need to store 
@@ -70,7 +68,6 @@ def getSub(n, imageName, overlap):
             #textTime = time.time() - edgeTime - start
             #textTimeL += [textTime]
       
-            
             avgList += [avg] 
             yellowList += [yellow] 
             varList += [var] 
@@ -94,10 +91,9 @@ def allMetrics(dictionary,n, im, overlap):
     overlapSize = int(overlap*n)
     numberTiles = int((width-n)/(overlapSize)+1)*int(((height-n)/(overlapSize))+1)
     metricArray = numpy.zeros((numberMetrics, numberTiles))
-    #print numberTiles
     
-    for i in range(0,int(width - n), int(overlap*n)): 
-        for j in range(0,int(height- n), int(overlap*n)): 
+    for i in range(0,width - n+1, int(overlap*n)): 
+        for j in range(0,height- n+1, int(overlap*n)): 
             #you're at the start of a box 
             metricTotals = len(dictionary[(0,0)])*[0.0]
             
@@ -113,9 +109,7 @@ def allMetrics(dictionary,n, im, overlap):
             
             ##Put all metrics metrics in an array. One metric per row. 
             for index in range(len(metricTotals)): 
-                metricArray[index,(i/(overlap*n) + j*(width-n)/((overlap*n)**2))] = newMetric[index]
-    #        FinalMetricDict[(i,j)] = newMetric #fill in a dictionary keyed by upper left coord. of larger square 
-            #dictionary holds the overall metrics for that square.  
+                metricArray[index,(i/(overlap*n) + j*(width-n)/((overlap*n)**2))] = newMetric[index] 
     return metricArray 
             
 
@@ -285,6 +279,10 @@ def textureAnalysis(im):
                 count += 1
                 
     # calculate the percentage of high texture grids
+    
+    if width/n == 0: 
+        print width
+        raw_input('Oops')
     return float(count)/((width/n)*(height/n))
     
 def findYellowFast(im): 

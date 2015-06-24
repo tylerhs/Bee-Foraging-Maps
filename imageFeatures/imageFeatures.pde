@@ -24,7 +24,7 @@ int avgVal;
 
 void setup(){
   // load image
-  bg = loadImage("SmallTile.jpg");
+  bg = loadImage("FirstStitchSmall.jpeg");
   size(bg.width, bg.height);
 }
 
