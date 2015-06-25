@@ -24,6 +24,7 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     if False: #Make True if you want to calculate a new set of training metrics
         metricList, densityList = allTrainMetrics(imageList, densityList) #Compute the metrics on each training image 
         f = open('metricList.txt', 'w')
+        print >> f, list(metricList)
         f.close()
     else: 
         f = open('metricList.txt', 'r')
