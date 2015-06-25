@@ -10,6 +10,7 @@ from sklearn.gaussian_process import GaussianProcess
 import sklearn
 import math
 import OpenGL
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def svrAlg(X, densities): 
@@ -132,32 +133,24 @@ def densMapShort(densities,imageName, overlap, n):
     height = imageSize[1] 
     rowTiles = int((width-n)/(overlapSize))+1
     print 'rowTiles is', rowTiles
-    
-    
- #   print densities[0:rowTiles]
-   # print densities[rowTiles:2*rowTiles]
-    
-   # raw_input('Right?')
         
     points = [] #Compute the points where densities are being plotted
     for i in range(len(densities)):
         x = (i%rowTiles)*overlapSize + n/2
         y = (i/rowTiles)*overlapSize + n/2
         points += [[x,y]]
-    
-   # print points[0:rowTiles]
-   # print 'length is ', len(points[0:rowTiles])
-    #Interpolation
+    #interpolation
     grid_x, grid_y = numpy.mgrid[0:width, 0:height]
-    data = griddata(points, densities, (grid_x, grid_y), method = 'linear')
+    data = griddata(points, densities, (grid_x, grid_y), method = 'cubic')
     
     #Plotting stuff
     v = numpy.linspace(min(densities), max(densities), 20, endpoint=True)
     fig = plt.contourf(grid_x, grid_y, data, levels = v, alpha = 0.4, antialiased = True)
+
     mapIm = Image.open(imageName)
     plt.imshow(mapIm)
     x = plt.colorbar(fig)
-    
+
     
 def testDensMap(n, overlap, imageName): 
     densities = [] 

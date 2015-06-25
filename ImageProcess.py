@@ -7,6 +7,9 @@ import time
 from operator import add
 from sklearn import preprocessing
 from skimage import data
+
+from MachineLearning import * 
+
 #from multiprocessing import Pool   ##Hopefully figure this out - used for multithreading 
 
 #Extract all nxn rectangles from an image (these will be processed then used as inputs for ML algorithm). 
@@ -43,9 +46,6 @@ def getSub(n, imageName, overlap):
             box = (i,j,i+smallTileSize, j+smallTileSize)  #edge coordinates of the next rectangle. 
             newImage = image.crop(box) #pull out the desired rectangle
         #    subList += [newImage] #More efficient way to store each image? 
-            ##Add in metric calculations here - don't need to store 
-            
-            
             ### METRIC CALCULATIONS - Time counters commented out for now. 
            # start = time.time()
             avg = colorAvg(newImage) 
@@ -92,15 +92,16 @@ def allMetrics(dictionary,n, im, overlap):
     numberTiles = int((width-n)/(overlapSize)+1)*int(((height-n)/(overlapSize))+1)
     metricArray = numpy.zeros((numberMetrics, numberTiles))
     
-    for i in range(0,width - n+1, int(overlap*n)): 
-        for j in range(0,height- n+1, int(overlap*n)): 
+    for i in range(0,width - n, int(overlap*n)): 
+        for j in range(0,height- n, int(overlap*n)): 
             #you're at the start of a box 
             metricTotals = len(dictionary[(0,0)])*[0.0]
             ##Adding up metrics from small tiles 
             for k in range(i,i+n-int(overlap*n)+1, int(overlap*n)): 
                 for m in range(j, j+n-int(overlap*n)+1, int(overlap*n)): 
                     #pull out metrics 
-                    metrics = dictionary[(k,m)] 
+                    metrics = dictionary[(k,m)]
+                    #print metrics 
                     metricTotals = map(add, metricTotals, metrics)
             ##Averaging metrics 
             num = 1/(overlap**2)
@@ -108,10 +109,10 @@ def allMetrics(dictionary,n, im, overlap):
             
             ##Put all metrics metrics in an array. One metric per row. 
             for index in range(len(metricTotals)): 
-                metricArray[index,(i/(overlap*n) + j*(width-n)/((overlap*n)**2))] = newMetric[index] 
+                metricArray[index,int(i/(overlap*n) + j*(width-n)/((overlap*n)**2))] = newMetric[index] 
+    #print metricArray 
+    #raw_input('Huh?')
     return metricArray 
-            
-
                 
 def calcMetrics(imageName, tileSize, overlap): 
     """wrapper function to calculate metrics for each tile of the image.
@@ -144,6 +145,52 @@ def scaleMetrics(metricArray):
     scaledArray = scaler.transform(metricArray) 
     return scaledArray, scaler 
 
+
+#######################Debugging Functions############################# 
+
+
+def oneDensity((i,j), w, h, imageName): 
+    densityList = [0.0,0.15, 0.75, 0.06, 0.96, 0.0, 0.92]
+
+    image = Image.open(imageName) 
+    
+    box = (i,j,i+w, j+h)
+    newImage = image.crop(box)
+    f = open('metricList.txt', 'r')
+    data = f.read()
+    metricList = eval(data)
+    scaledTraining, scaler = scaleMetrics(metricList)
+    
+    #Calculate metrics 
+    avg = colorAvg(newImage) 
+    yellow = findYellowFast(newImage) 
+    edges = countEdgePixels(newImage) 
+    var = colorVariance(newImage) 
+    texture = textureAnalysis(newImage)
+    Metrics = (avg[0], avg[1], avg[2], yellow, var, edges, texture)
+    Metrics = scaler.transform(Metrics)
+    
+    #Find fit 
+    fit = svrAlg(scaledTraining, densityList)
+    
+    
+    density = fit.predict(Metrics)
+    return list(density)
+    
+def allDensities(w,h, imageName): 
+    image = Image.open(imageName) 
+    imageSize = image.size 
+    width = imageSize[0]
+    height = imageSize[1] 
+    
+    densityList = []
+    for k in range(0, height -h, h): 
+        for m in range(0, width - w, w): 
+            currentDensity = oneDensity((m,k), h, w, imageName)
+            densityList += currentDensity
+    return densityList 
+    
+    
 ######TRAINING SET CALCULATIONS#########################
 
 def trainMetrics(imageName, density): 

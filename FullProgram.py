@@ -21,7 +21,7 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     
     imageList = makePicList(7) #Make a list of picture names, numbered by site number '1.jpg' etc. 
     ####Step 1: Calculate Training Metrics 
-    if False: #Make True if you want to calculate a new set of training metrics
+    if True: #Make True if you want to calculate a new set of training metrics
         metricList, densityList = allTrainMetrics(imageList, densityList) #Compute the metrics on each training image 
         f = open('metricList.txt', 'w')
         print >> f, list(metricList)
@@ -64,7 +64,6 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     
     densities = densMap(fit, scaledMetrics, tileSize, overlap, imageSize, imageName ) 
     numpy.savetxt("densities.csv", densities, delimiter=",",  fmt= '%.4f')   # print 'Completed density map'
-    
 
 def totalGauss(densityList, imageName,tileSize, overlap): 
     """Does a complete run of the SVR learning algorithm. Takes in a training set of density
