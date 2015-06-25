@@ -96,7 +96,6 @@ def allMetrics(dictionary,n, im, overlap):
         for j in range(0,height- n+1, int(overlap*n)): 
             #you're at the start of a box 
             metricTotals = len(dictionary[(0,0)])*[0.0]
-            
             ##Adding up metrics from small tiles 
             for k in range(i,i+n-int(overlap*n)+1, int(overlap*n)): 
                 for m in range(j, j+n-int(overlap*n)+1, int(overlap*n)): 
