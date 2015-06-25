@@ -45,7 +45,7 @@ void drawMap(){
   colorMode(HSB, 100);
   for(int i=0; i<w; i++)
     for(int j=0; j<h; j++)
-      set(i,j,color(densities.getFloat(j,i)*(100/maxDensity), 100,100));
+      set(i,j,color(0, 0,densities.getFloat(j,i)*(100/maxDensity)));
 }
 
 // identify spots with flowers and store them in an ArrayList
