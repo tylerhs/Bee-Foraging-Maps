@@ -21,7 +21,7 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     
     imageList = makePicList(7) #Make a list of picture names, numbered by site number '1.jpg' etc. 
     ####Step 1: Calculate Training Metrics 
-    if True: #Make True if you want to calculate a new set of training metrics
+    if False: #Make True if you want to calculate a new set of training metrics
         metricList, densityList = allTrainMetrics(imageList, densityList) #Compute the metrics on each training image 
         f = open('metricList.txt', 'w')
         print >> f, list(metricList)
@@ -31,8 +31,6 @@ def totalSVR(densityList, imageName,tileSize, overlap):
         data = f.read()
         metricList = eval(data)
     
-    #print 'metric list ', metricList
-    #print 'Training metrics computed' 
     
     ##Step 2: Scale the incoming training data 
     
@@ -46,15 +44,21 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     
     ###Calculate metrics on full image 
     
-    if True: #Make true if you need to calculate image metrics on a new image. Otherwise make false 
-        imageMetrics = calcMetrics(imageName, tileSize, overlap) #calculate the image metrics on the full image
-        #Scale the metrics 
-        scaledMetrics = scaler.transform(imageMetrics) ##These are the final metrics on the full image - scaled the same as the training metrics 
-        f = open('imageMetrics.txt', 'w')
-        print >> f, list(scaledMetrics)
+    #if True: #Make true if you need to calculate image metrics on a new image. Otherwise make false 
+    #    imageMetrics = calcMetrics(imageName, tileSize, overlap) #calculate the image metrics on the full image
+    #    #Scale the metrics 
+    #    scaledMetrics = scaler.transform(imageMetrics) ##These are the final metrics on the full image - scaled the same as the training metrics 
+    #    f = open('imageMetrics.txt', 'w')
+    #    print >> f, list(scaledMetrics)
+    #    f.close()
+    if True: #Make true if you need to calculate image metrics on a new image. Otherwise make false
+        imageDens = allDensOverlap(tileSize, imageName, overlap)
+        fileName = 'FirstStitchDensities.txt'
+        f = open(fileName, 'w')
+        print >> f, list(imageDens)
         f.close()
     else: 
-        f = open('imageMetrics.txt', 'r')
+        f = open('fileName.txt', 'r')
         data = f.read()
         scaledMetrics = eval(data)
     
@@ -62,8 +66,9 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     
     print 'Image metrics computed'
     
-    densities = densMap(fit, scaledMetrics, tileSize, overlap, imageSize, imageName ) 
-    numpy.savetxt("densities.csv", densities, delimiter=",",  fmt= '%.4f')   # print 'Completed density map'
+  #  densities = densMap(fit, scaledMetrics, tileSize, overlap, imageSize, imageName ) 
+    densMapShort(imageDens,imageName, overlap, tileSize)
+    numpy.savetxt("densities.csv", imageDens, delimiter=",",  fmt= '%.4f')   # print 'Completed density map'
 
 def totalGauss(densityList, imageName,tileSize, overlap): 
     """Does a complete run of the SVR learning algorithm. Takes in a training set of density

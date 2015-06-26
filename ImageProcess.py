@@ -47,6 +47,8 @@ def getSub(n, imageName, overlap):
             newImage = image.crop(box) #pull out the desired rectangle
         #    subList += [newImage] #More efficient way to store each image? 
             ### METRIC CALCULATIONS - Time counters commented out for now. 
+
+            
            # start = time.time()
             avg = colorAvg(newImage) 
           #  avgTime = time.time() - start 
@@ -79,7 +81,6 @@ def getSub(n, imageName, overlap):
 
    # return avgList, yellowList, varList, edgeList, textList, avgTimeL, yellowTimeL, varTimeL, edgeTimeL, textTimeL
     return MetricDict
-   ## return subList #return a list of images (use image.show() to display). 
     
 def allMetrics(dictionary,n, im, overlap): 
     """Takes in a dictionary of results from small tiles and calculates average metrics 
@@ -150,12 +151,14 @@ def scaleMetrics(metricArray):
 
 
 def oneDensity((i,j), w, h, imageName): 
-    densityList = [0.0,0.15, 0.75, 0.06, 0.96, 0.0, 0.92]
+    densityList = [0.0,1.0, 0.99, 0.02, 0.64, 0.0, 0.1]
 
     image = Image.open(imageName) 
     
     box = (i,j,i+w, j+h)
     newImage = image.crop(box)
+    
+    
     f = open('metricList.txt', 'r')
     data = f.read()
     metricList = eval(data)
@@ -168,14 +171,63 @@ def oneDensity((i,j), w, h, imageName):
     var = colorVariance(newImage) 
     texture = textureAnalysis(newImage)
     Metrics = (avg[0], avg[1], avg[2], yellow, var, edges, texture)
+   # print 'Original Metrics ', Metrics
     Metrics = scaler.transform(Metrics)
     
     #Find fit 
     fit = svrAlg(scaledTraining, densityList)
-    
-    
+        
     density = fit.predict(Metrics)
     return list(density)
+ 
+def oneDensOverlap((i,j), n, imageName, overlap, subTileDict, fit, scaler): 
+    """Computes the density of one tile with overlap""" 
+    #Note that this algorithm assumes 1/overlap is an integer 
+    shiftSize = int(n*overlap)
+    #How many subtiles are in the width of the image? 
+    numTiles =int( 1/overlap )
+    metricTotal = len(subTileDict[(0,0)])*[0.0]
+    for k in range(numTiles): 
+        for m in range(numTiles): 
+           # print (k,m)
+            newMetrics = subTileDict[(i + m*shiftSize, j + k*shiftSize)]
+            metricTotal = map(add, metricTotal, newMetrics)
+  #  print metricTotal
+    num = 1/(overlap**2)
+    avgMetric = [a/num for a in metricTotal] #Compute the average 
+   # print avgMetric
+    scaledMetric = scaler.transform(avgMetric) #Scale the metric 
+    density = fit.predict(scaledMetric) 
+    return list(density)
+    
+def allDensOverlap(n, imageName, overlap): 
+    """Computes all densities on a map with tilesize n, the given image as the map, and an overlap 1-overlap."""
+    image = Image.open(imageName) 
+    imageSize = image.size 
+    width = imageSize[0]
+    height = imageSize[1] 
+    densityList = []
+    
+    subTileDict = getSub(n, imageName, overlap) #Compute the metrics on subtiles 
+    
+    #Read in the training data
+    f = open('metricList.txt', 'r')
+    data = f.read()
+    metricList = eval(data)
+    scaledTraining, scaler = scaleMetrics(metricList)
+    
+    densityList = [0.0,1.0, 0.99, 0.02, 0.64, 0.0, 0.1] ##Change density list in code because training only happens once. 
+    fit = svrAlg(scaledTraining, densityList)
+    
+    allDensities = []
+    shiftSize = int(n*overlap)
+    for k in range(0, height -n, shiftSize): 
+        for m in range(0, width - n, shiftSize): 
+          #  print (m,k)
+            currentDensity = oneDensOverlap((m,k), n, imageName, overlap, subTileDict, fit, scaler)
+            allDensities += currentDensity
+    return allDensities 
+    
     
 def allDensities(w,h, imageName): 
     image = Image.open(imageName) 

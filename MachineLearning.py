@@ -18,9 +18,7 @@ def svrAlg(X, densities):
         and densities, the corresponding densities. Note that X and densities should be updated 
         with actual field data collected."""
    # X = [[0, 0], [2, 2]] #X is the array of metrics 
-
     #densities = [0.5, 2.5] #densities are the measured densities 
-
     clf = SVR() #initialize support vector regression thing. 
 
     clf.fit(X,densities) #trains the model 
