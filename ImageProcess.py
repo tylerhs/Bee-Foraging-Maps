@@ -6,7 +6,7 @@ from colorsys import *
 import time
 from operator import add
 from sklearn import preprocessing
-from skimage import data
+#from skimage import data
 
 from MachineLearning import * 
 
@@ -407,6 +407,7 @@ def findYellowFast(im):
     portion = float(count)/totalPix
     #print(portion)
     return portion
+    
 def getHSV((r,g,b)): 
     return rgb_to_hsv(r/255., g/255., b/255.)
     
