@@ -173,6 +173,7 @@ def oneDensity((i,j), w, h, imageName):
     Metrics = (avg[0], avg[1], avg[2], yellow, var, edges, texture)
    # print 'Original Metrics ', Metrics
     Metrics = scaler.transform(Metrics)
+    print Metrics
     
     #Find fit 
     fit = svrAlg(scaledTraining, densityList)
