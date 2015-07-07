@@ -201,13 +201,13 @@ def oneDensOverlap((i,j), n, imageName, overlap, subTileDict, fit, scaler):
     density = fit.predict(scaledMetric) 
     return list(density)
     
-def allDensOverlap(n, imageName, overlap): 
+def allDensOverlap(n, imageName, overlap, densityList): 
     """Computes all densities on a map with tilesize n, the given image as the map, and an overlap 1-overlap."""
     image = Image.open(imageName) 
     imageSize = image.size 
     width = imageSize[0]
     height = imageSize[1] 
-    densityList = []
+   # densityList = []
     
     subTileDict = getSub(n, imageName, overlap) #Compute the metrics on subtiles 
     
@@ -217,7 +217,7 @@ def allDensOverlap(n, imageName, overlap):
     metricList = eval(data)
     scaledTraining, scaler = scaleMetrics(metricList)
     
-    densityList = [0.0,1.0, 0.99, 0.02, 0.64, 0.0, 0.1] ##Change density list in code because training only happens once. 
+  #  densityList = [0.0,1.0, 0.99, 0.02, 0.64, 0.0, 0.1] ##Change density list in code because training only happens once. 
     fit = svrAlg(scaledTraining, densityList)
     
     allDensities = []
@@ -266,7 +266,23 @@ def allTrainMetrics(imageList, densityList):
         metricsList += [metrics] 
     return metricsList, densityList
     
-      
+def allTrainMetricsTransect(imageList, densityList):  
+    metricsList = []
+    for i in range(len(imageList)): 
+        image = imageList[i]
+        [metrics, density] = trainMetricsTransect(image, densityList[i]) 
+        metricsList += [metrics] 
+    return metricsList, densityList  
+    
+def trainMetricsTransect(image, density): 
+    avg = colorAvg(image) 
+    yellow = findYellowFast(image) 
+    edges = countEdgePixels(image) 
+    var = colorVariance(image) 
+    texture = textureAnalysis(image) 
+    
+    metrics = [avg[0], avg[1], avg[2], yellow, var, edges, texture] 
+    return [metrics, density]  
           
 #Start of helper functions for computing metrics. 
     

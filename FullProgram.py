@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from ImageProcess import * 
 from MachineLearning import *
-
+import DensityAlignment
+import math
 
 def main():  #we never use this now. 
     imageName = 'SmallTile.jpg'
@@ -20,8 +21,26 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     imageSize = image.size #get the image size 
     
     imageList = makePicList(7) #Make a list of picture names, numbered by site number '1.jpg' etc. 
+    
+    if True: ## Testing a transect density list 
+        trainingData = numpy.zeros(50)
+        trainingData[0] = 5
+        trainingData[2] = 14
+        trainingData[3] = 3
+        trainingData[4] = 7
+        trainingData[6] = 8
+        trainingData[19] = 5
+        
+        imageList = DensityAlignment.divideTransect((1035,588),(456,1720),'TransectStitch1.jpg')
+        densityList = trainingData
+        
+        metricList, densityList = allTrainMetricsTransect(imageList, densityList)
+        f = open('metricList.txt', 'w')
+        print >> f, list(metricList)
+        f.close()
+        
     ####Step 1: Calculate Training Metrics 
-    if False: #Make True if you want to calculate a new set of training metrics
+    elif False: #Make True if you want to calculate a new set of training metrics
         metricList, densityList = allTrainMetrics(imageList, densityList) #Compute the metrics on each training image 
         f = open('metricList.txt', 'w')
         print >> f, list(metricList)
@@ -52,7 +71,7 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     #    print >> f, list(scaledMetrics)
     #    f.close()
     if True: #Make true if you need to calculate image metrics on a new image. Otherwise make false
-        imageDens = allDensOverlap(tileSize, imageName, overlap)
+        imageDens = allDensOverlap(tileSize, imageName, overlap, densityList)
         fileName = 'FirstStitchDensities.txt'
         f = open(fileName, 'w')
         print >> f, list(imageDens)
