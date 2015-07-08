@@ -201,7 +201,7 @@ def oneDensOverlap((i,j), n, imageName, overlap, subTileDict, fit, scaler):
     density = fit.predict(scaledMetric) 
     return list(density)
     
-def allDensOverlap(n, imageName, overlap, densityList): 
+def allDensOverlap(n, imageName, overlap, densityList, metricList): 
     """Computes all densities on a map with tilesize n, the given image as the map, and an overlap 1-overlap."""
     image = Image.open(imageName) 
     imageSize = image.size 
@@ -259,6 +259,8 @@ def trainMetrics(imageName, density):
     
 def allTrainMetrics(imageList, densityList): 
     metricsList = []
+    print 'images ', imageList 
+    print 'densityList ', densityList
     for i in range(len(imageList)): 
         imageName = imageList[i]
         #currentIm = Image.open(imageName) 

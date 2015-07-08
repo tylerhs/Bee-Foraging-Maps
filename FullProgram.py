@@ -14,38 +14,67 @@ def main():  #we never use this now.
     
     learnSVR(scaledMetrics, tileSize, overlap, imageSize)
     
-def totalSVR(densityList, imageName,tileSize, overlap): 
+def totalSVR(densityList, imageName,tileSize, overlap, trainingType): 
     """Does a complete run of the SVR learning algorithm. Takes in a training set of density
         data, an imageName in a string, the size of tile desired and an overlap as a percentage."""
     image = Image.open(imageName) #open the image
     imageSize = image.size #get the image size 
     
-    imageList = makePicList(7) #Make a list of picture names, numbered by site number '1.jpg' etc. 
+    #trainingType: 0 = transect 
+    #              1 = picList 
+    #              2 = previous data set 
+                  
+                  
+                  
+    ##Note that if you have multiple transects you can simply save each transects group of pictures as a picList and then use method 1. 
     
-    if True: ## Testing a transect density list 
-        trainingData = numpy.zeros(50)
-        trainingData[0] = 5
-        trainingData[2] = 14
+                  
+    if trainingType == 0: ###You want to pull data from a transect picture. 
+        trainingData = numpy.zeros(50) ##Initialize the array to hold densities 
+        
+        ##Manually change densities where flowers existed here. All other entries will be 0. 
+        ## This data comes from the BFS Survey Master Data Sheet. Values are # of flowers. 
+        trainingData[2] = 14 
         trainingData[3] = 3
         trainingData[4] = 7
         trainingData[6] = 8
         trainingData[19] = 5
         
-        imageList = DensityAlignment.divideTransect((1035,588),(456,1720),'TransectStitch1.jpg')
-        densityList = trainingData
+        ## Change the name of the transect images, as well as the coordinates of the start and end in this function call. 
         
+        imageList = DensityAlignment.divideTransect((1035,588),(456,1720),'TransectStitch1.jpg') ## Divide the transect into 50 images. Store in a list. 
+        densityList = list(trainingData)
+        
+        ##Compute the metrics on each training image. 
         metricList, densityList = allTrainMetricsTransect(imageList, densityList)
+        
+        
+        ### Save the training set  - metrics
         f = open('metricList.txt', 'w')
         print >> f, list(metricList)
         f.close()
         
-    ####Step 1: Calculate Training Metrics 
-    elif False: #Make True if you want to calculate a new set of training metrics
-        metricList, densityList = allTrainMetrics(imageList, densityList) #Compute the metrics on each training image 
+        ### Save the training set - densities 
+        f = open('densityList.txt', 'w')
+        print >> f, densityList 
+        f.close()
+        
+    if trainingType == 1:  ##pull in pictures titled '1.jpg', etc. 
+        NUMPICS = 50  ##Change the number of training pictures here. 
+        imageList = makePicList(NUMPICS)
+        metricList, densityList = allTrainMetrics(imageList, densityList)
+        
+        ### Save the training set  - metrics
         f = open('metricList.txt', 'w')
         print >> f, list(metricList)
         f.close()
-    else: 
+        
+        ### Save the training set - densities 
+        f = open('densityList.txt', 'w')
+        print >> f, densityList 
+        f.close()        
+        
+    if trainingType == 2: 
         f = open('metricList.txt', 'r')
         data = f.read()
         metricList = eval(data)
@@ -61,33 +90,22 @@ def totalSVR(densityList, imageName,tileSize, overlap):
     
     print 'Machine Learning done'
     
-    ###Calculate metrics on full image 
+    ###Calculate densities on full image 
     
-    #if True: #Make true if you need to calculate image metrics on a new image. Otherwise make false 
-    #    imageMetrics = calcMetrics(imageName, tileSize, overlap) #calculate the image metrics on the full image
-    #    #Scale the metrics 
-    #    scaledMetrics = scaler.transform(imageMetrics) ##These are the final metrics on the full image - scaled the same as the training metrics 
-    #    f = open('imageMetrics.txt', 'w')
-    #    print >> f, list(scaledMetrics)
-    #    f.close()
     if True: #Make true if you need to calculate image metrics on a new image. Otherwise make false
-        imageDens = allDensOverlap(tileSize, imageName, overlap, densityList)
-        fileName = 'FirstStitchDensities.txt'
+        imageDens = allDensOverlap(tileSize, imageName, overlap, densityList, metricList)
+        fileName = imageName[0:-4] + 'Densities' +  '.txt'
         f = open(fileName, 'w')
         print >> f, list(imageDens)
         f.close()
     else: 
-        f = open('fileName.txt', 'r')
+        fileName = imageName[0:-4] + 'Densities' +  '.txt'
+        f = open(fileName, 'r')
         data = f.read()
-        scaledMetrics = eval(data)
-    
+        imageDens = eval(data)
 
-    
-    print 'Image metrics computed'
-    
-  #  densities = densMap(fit, scaledMetrics, tileSize, overlap, imageSize, imageName ) 
+    print 'Image densities computed'
     densMapShort(imageDens,imageName, overlap, tileSize)
-    numpy.savetxt("densities.csv", imageDens, delimiter=",",  fmt= '%.4f')   # print 'Completed density map'
 
 def totalGauss(densityList, imageName,tileSize, overlap): 
     """Does a complete run of the SVR learning algorithm. Takes in a training set of density

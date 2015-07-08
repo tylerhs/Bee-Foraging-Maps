@@ -3,7 +3,7 @@ import math
 
 def divideTransect(Start, End, imageName): 
     """Takes in the pixel coordinates of a start and end for a transect. Divides into images that
-        match the collected density data.""" 
+        match the collected density data. Outputs a list of these PIL images.""" 
         
     image = Image.open(imageName)
     ##First, calculate the length of the transect. 
@@ -45,7 +45,7 @@ def transectHoriz(Start, End, image):
     return imageList
         
 def transectVert(Start, End, image): 
-    """Transect runs left and right in the image."The left end is start.""" 
+    """Transect runs left and right in the image.The left end is start.""" 
     length = int(math.sqrt(abs(Start[0] - End[0])**2 + abs(Start[1] - End[1])**2)) 
     slope = (End[0] - Start[0])/float(length)
     print 'slope ', slope
@@ -74,6 +74,18 @@ def transectVert(Start, End, image):
     print 'Length is ', len(imageList)
     return imageList
 
+def saveTransect(imageList, start): 
+    """Takes in a list of the images from a transect and saves each image so that it can be called 
+        in the machine learning portion as a training set data point.
+        Inputs: imageList, a list of PIL images 
+        start: the file number you want to start saving images at. 
+        No output, saves files in your current directory.""" 
+    currentNum = start
+    for quadrat in imageList: 
+        fileName = str(currentNum) + '.jpg'
+        quadrat.save(fileName)
+        currentNum += 1 
+            
 def main(): 
     ####//1046, 594
 ######//460,1718*/
