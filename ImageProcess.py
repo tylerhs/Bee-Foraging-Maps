@@ -128,13 +128,13 @@ def calcMetrics(imageName, tileSize, overlap):
     #scaled, scaler = scaleMetrics(finalMetrics) ##Scale metrics 
     totalSize = finalMetrics.size #Find the size of this scaled metric array
     numCols = totalSize/NUMBERMETRICS  #Find the number of tiles =number of cols
-    scaledMetrics = []
+    returnList = []
     for i in range(numCols): ##Change output into a list of lists 
         currentMetric = [] 
         for metric in range(NUMBERMETRICS): 
             currentMetric += [finalMetrics[metric, i]] 
-        scaledMetrics += [currentMetric]
-    return scaledMetrics #return the scaledmetrics and the scaler for later use...
+        returnList += [currentMetric]
+    return returnList #return the metrics for later
     
 def scaleMetrics(metricArray): 
     """Takes in a array of metrics, scales them to have 
@@ -201,7 +201,7 @@ def oneDensOverlap((i,j), n, imageName, overlap, subTileDict, fit, scaler):
     density = fit.predict(scaledMetric) 
     return list(density)
     
-def allDensOverlap(n, imageName, overlap, densityList, metricList): 
+def allDensOverlap(n, imageName, overlap, densityList, metricList, fit, scaler): 
     """Computes all densities on a map with tilesize n, the given image as the map, and an overlap 1-overlap."""
     image = Image.open(imageName) 
     imageSize = image.size 
@@ -210,16 +210,7 @@ def allDensOverlap(n, imageName, overlap, densityList, metricList):
    # densityList = []
     
     subTileDict = getSub(n, imageName, overlap) #Compute the metrics on subtiles 
-    
-    #Read in the training data
-    f = open('metricList.txt', 'r')
-    data = f.read()
-    metricList = eval(data)
-    scaledTraining, scaler = scaleMetrics(metricList)
-    
-  #  densityList = [0.0,1.0, 0.99, 0.02, 0.64, 0.0, 0.1] ##Change density list in code because training only happens once. 
-    fit = svrAlg(scaledTraining, densityList)
-    
+
     allDensities = []
     shiftSize = int(n*overlap)
     for k in range(0, height -n, shiftSize): 

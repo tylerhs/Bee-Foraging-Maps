@@ -29,7 +29,7 @@ def gaussReg(metrics, densities):
   #  metrics = [[0, 0], [2, 2]] #List of lists of metrics calculated 
    # densities =  [0.5, 2.5] #The corresponding densities 
     
-    gp = GaussianProcess(corr='squared_exponential', theta0=1e-1,
+    gp = GaussianProcess(corr='absolute_exponential', theta0=1e-1,
                      thetaL=1e-3, thetaU=1,
                      random_start=100)    #Change these parameters to get better fit...            
     gp.fit(metrics, densities)
@@ -130,7 +130,6 @@ def densMapShort(densities,imageName, overlap, n):
     width = imageSize[0] 
     height = imageSize[1] 
     rowTiles = int((width-n)/(overlapSize))+1
-    print 'rowTiles is', rowTiles
         
     points = [] #Compute the points where densities are being plotted
     for i in range(len(densities)):
