@@ -3,16 +3,6 @@ from ImageProcess import *
 from MachineLearning import *
 import DensityAlignment
 import math
-
-def main():  #we never use this now. 
-    imageName = 'SmallTile.jpg'
-    tileSize = 50 
-    
-    overlap = 0.1 
-    imageSize = [472, 398]
-    scaledMetrics, scaler= calcMetrics(imageName, tileSize, overlap) 
-    
-    learnSVR(scaledMetrics, tileSize, overlap, imageSize)
     
 def totalSVR(densityList, imageName,tileSize, overlap, trainingType): 
     """Does a complete run of the SVR learning algorithm. Takes in a training set of density
