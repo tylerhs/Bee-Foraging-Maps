@@ -328,17 +328,17 @@ def textureAnalysis(im):
     return float(count)/((width/n)*(height/n))
     
 def findYellowFast(im): 
-    """counts the number of yellow pixels in the given image.""" 
+    """counts the number of a given color pixels in the given image.""" 
  #   im = Image.open(imageName)
     #define HSV value ranges for yellow  
     #for now just base of Hue - refine for actual yellows seen in field? 
-    minHue = 43/360.
-    maxHue = 49/360.
+    minHue = 20/360.
+    maxHue = 150/360.
     
-    minSat = 80/360. 
+    minSat = 5/360. 
    # maxSat = 0.4
    
-    minV = 70/360.
+    minV = 190/360.
     
     width, height = im.size  #find the size of the image 
     count = 0 #initialize a counter for yellow pixels.  

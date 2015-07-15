@@ -19,7 +19,7 @@ def svrAlg(X, densities):
         with actual field data collected."""
    # X = [[0, 0], [2, 2]] #X is the array of metrics 
     #densities = [0.5, 2.5] #densities are the measured densities 
-    clf = SVR( C = 1, epsilon = 0.5, degree = 10) #initialize support vector regression thing. 
+    clf = SVR( kernel = 'rbf', gamma = 0.05, epsilon = 0.4) #initialize support vector regression thing. 
 
     clf.fit(X,densities) #trains the model 
 
@@ -138,11 +138,11 @@ def densMapShort(densities,imageName, overlap, n):
         points += [[x,y]]
     #interpolation
     grid_x, grid_y = numpy.mgrid[0:width, 0:height]
-    data = griddata(points, densities, (grid_x, grid_y), method = 'cubic')
+    data = griddata(points, densities, (grid_x, grid_y), method = 'linear')
     
     #Plotting stuff
     v = numpy.linspace(min(densities), max(densities), 20, endpoint=True)
-    fig = plt.contourf(grid_x, grid_y, data, levels = v, alpha = 0.7, antialiased = True)
+    fig = plt.contourf(grid_x, grid_y, data, levels = v, alpha = 0.4, antialiased = True)
 
     mapIm = Image.open(imageName)
     plt.imshow(mapIm)

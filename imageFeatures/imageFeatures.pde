@@ -24,7 +24,7 @@ int avgVal;
 
 void setup(){
   // load image
-  bg = loadImage("FirstStitchSmall.jpeg");
+  bg = loadImage("BuckwheatPatch.jpg");
   size(bg.width, bg.height);
 }
 
