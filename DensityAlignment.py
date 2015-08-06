@@ -86,21 +86,3 @@ def saveTransect(imageList, start):
         quadrat.save(fileName)
         currentNum += 1 
             
-def main():  
-    """Helper function to test the transect stitches and make sure they 
-        are reasonable. Takes no arguments. Parameters are changed inside the function."""
-
-    imageName = 'TransectStitch1.jpg'
-    #End = (594, 1046)
-    #Start = (1718, 460)
-
-    Start = (1035,588)
-    End = (456,1720)
-
-  #  Start = tuple(raw_input('Please Input Start Coordinates'))
-   # End  = tuple(raw_input('Please Input End Coordinates'))
-   
-    stuff= divideTransect(Start, End, imageName)
-    if len(stuff) != 50: 
-        print "Error! Transect length is not 50 meters." 
-    return stuff

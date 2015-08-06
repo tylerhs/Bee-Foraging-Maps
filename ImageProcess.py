@@ -1,4 +1,4 @@
-import ImageFilter
+from PIL import ImageFilter
 import numpy
 from PIL import Image
 from PIL import ImageStat
@@ -69,14 +69,15 @@ def getSub(n, imageName, overlap):
             texture = textureAnalysis(newImage) 
             #textTime = time.time() - edgeTime - start
             #textTimeL += [textTime]
-      
+            valVar = valRange(newImage)
+            
             avgList += [avg] 
             yellowList += [yellow] 
             varList += [var] 
             edgeList += [edges]
             textList += [texture]
-            Metrics = (avg[0], avg[1], avg[2], yellow, var, edges, texture) #store metrics
-            
+            #Metrics = (avg[0], avg[1], avg[2], yellow, var, edges, texture) #store metrics
+            Metrics = (yellow, var, edges, texture, valVar)
             MetricDict[(i,j)] = Metrics
 
    # return avgList, yellowList, varList, edgeList, textList, avgTimeL, yellowTimeL, varTimeL, edgeTimeL, textTimeL
@@ -88,7 +89,7 @@ def allMetrics(dictionary,n, im, overlap):
     width, height = im.size 
   #  print dictionary
     #FinalMetricDict = {}
-    numberMetrics = 7 #Change for diff number of metrics as we add more. 
+    numberMetrics = 5 #Change for diff number of metrics as we add more. 
     overlapSize = int(overlap*n)
     numberTiles = int((width-n)/(overlapSize)+1)*int(((height-n)/(overlapSize))+1)
     metricArray = numpy.zeros((numberMetrics, numberTiles))
@@ -121,7 +122,7 @@ def calcMetrics(imageName, tileSize, overlap):
         of the upper left hand of the tile desired. Also returns a scalar object 
         for scaling future input data. """ 
         
-    NUMBERMETRICS = 7
+    NUMBERMETRICS = 5
     im = Image.open(imageName)
     subDict = getSub(tileSize, imageName, overlap)  #Get a dictionary of metrics for small tiles
     finalMetrics = allMetrics(subDict, tileSize, im, overlap) #calculate metrics on larger tiles  
@@ -171,6 +172,36 @@ def oneDensOverlap((i,j), n, imageName, overlap, subTileDict, fit, scaler):
     density = fit.predict(scaledMetric) 
     return list(density)
     
+    
+def oneDensOverlapClass((i,j), n, imageName, overlap, subTileDict, fit, scaler, classifier): 
+    """Computes the density of one tile with overlap""" 
+    #Note that this algorithm assumes 1/overlap is an integer 
+    shiftSize = int(n*overlap)
+    #How many subtiles are in the width of the image? 
+    numTiles =int( 1/overlap )
+    metricTotal = len(subTileDict[(0,0)])*[0.0]
+    for k in range(numTiles): 
+        for m in range(numTiles): 
+           # print (k,m)
+            newMetrics = subTileDict[(i + m*shiftSize, j + k*shiftSize)]
+            metricTotal = map(add, metricTotal, newMetrics)
+  #  print metricTotal
+    num = 1/(overlap**2)
+    avgMetric = [a/num for a in metricTotal] #Compute the average 
+   # print avgMetric
+    scaledMetric = scaler.transform(avgMetric) #Scale the metric 
+    density = fit.predict(scaledMetric) 
+    bush = classifier.predict(scaledMetric) 
+    if bush: 
+        return list(density) 
+    elif density < 0: 
+        return [0]
+    else: 
+       # print 'I found a patch that should have 0 density'
+        return [0]   
+    
+    
+    
 def allDensOverlap(n, imageName, overlap, densityList, metricList, fit, scaler): 
     """Computes all densities on a map with tilesize n, the given image as the map, and an overlap 1-overlap."""
     image = Image.open(imageName) 
@@ -190,24 +221,49 @@ def allDensOverlap(n, imageName, overlap, densityList, metricList, fit, scaler):
             allDensities += currentDensity
     return allDensities 
     
+def allDensOverlapClass(n, imageName, overlap, densityList, metricList, fit, scaler, classifier): 
+    """Computes all densities on a map with tilesize n, the given image as the map, and an overlap 1-overlap."""
+    image = Image.open(imageName) 
+    imageSize = image.size 
+    width = imageSize[0]
+    height = imageSize[1] 
+   # densityList = []
+    
+    subTileDict = getSub(n, imageName, overlap) #Compute the metrics on subtiles 
 
+    allDensities = []
+    shiftSize = int(n*overlap)
+    for k in range(0, height -n, shiftSize): 
+        for m in range(0, width - n, shiftSize): 
+          #  print (m,k)
+            currentDensity = oneDensOverlapClass((m,k), n, imageName, overlap, subTileDict, fit, scaler, classifier)
+            allDensities += currentDensity
+    return allDensities 
+    
+    
+    
+    
 ######TRAINING SET CALCULATIONS#########################
 
-def trainMetrics(imageName, density): 
+def trainMetrics(imageName, density):
+    """Computes the metrics on a single training image. Takes in the file name and the corresponding density. 
+       Returns a list of [metrics, density]. Density is unchanged.""" 
     image = Image.open(imageName) 
     avg = colorAvg(image) 
     yellow = findYellowFast(image) 
     edges = countEdgePixels(image) 
     var = colorVariance(image) 
     texture = textureAnalysis(image) 
+    valVar = valRange(image)
     
-    metrics = [avg[0], avg[1], avg[2], yellow, var, edges, texture] 
+   # metrics = [avg[0], avg[1], avg[2], yellow, var, edges, texture] 
+    metrics = [yellow, var, edges, texture, valVar]
     return [metrics, density] 
     
 def allTrainMetrics(imageList, densityList): 
+    """Takes in a list of images and a list of densities and calculates metrics on all images. Outputs a list of metrics and a list of densities 
+        corresponding to those metrics. densityList is unchanged."""
     metricsList = []
-    print 'images ', imageList 
-    print 'densityList ', densityList
     for i in range(len(imageList)): 
         imageName = imageList[i]
         #currentIm = Image.open(imageName) 
@@ -215,7 +271,8 @@ def allTrainMetrics(imageList, densityList):
         metricsList += [metrics] 
     return metricsList, densityList
     
-def allTrainMetricsTransect(imageList, densityList):  
+def allTrainMetricsTransect(imageList, densityList):
+    """See allTrainMetrics."""  
     metricsList = []
     for i in range(len(imageList)): 
         image = imageList[i]
@@ -224,13 +281,16 @@ def allTrainMetricsTransect(imageList, densityList):
     return metricsList, densityList  
     
 def trainMetricsTransect(image, density): 
+    "see trainMetrics."""
     avg = colorAvg(image) 
     yellow = findYellowFast(image) 
     edges = countEdgePixels(image) 
     var = colorVariance(image) 
     texture = textureAnalysis(image) 
+    valVar = valRange(iamge)
+   # metrics = [avg[0], avg[1], avg[2], yellow, var, edges, texture] 
     
-    metrics = [avg[0], avg[1], avg[2], yellow, var, edges, texture] 
+    metrics = [yellow, var, edges, texture, valVar]
     return [metrics, density]  
           
 #Start of helper functions for computing metrics. 
@@ -267,7 +327,7 @@ def colorVariance(im):
             histogram[pixelHue] += 1
     #print histogram
     # calculate standard deviation of histogram
-    return numpy.std(histogram)
+    return numpy.var(histogram)
         
     
       
@@ -336,7 +396,7 @@ def findYellowFast(im):
     maxHue = 150/360.
     
     minSat = 5/360. 
-   # maxSat = 0.4
+   # maxSat = 21/360.
    
     minV = 190/360.
     
@@ -351,6 +411,28 @@ def findYellowFast(im):
     portion = float(count)/totalPix
     #print(portion)
     return portion
+
+def valRange(im): 
+    """Calculates the difference in color based on the value."""
+    pix = im.load()
+    width, height = im.size
+    
+    # create empty histogram to be filled with frequencies
+   # histogram = [0]*361
+    valList = []
+    for i in range(width):
+        for j in range(height):
+            (r,g,b) = pix[i,j] #pull out the current r,g,b values 
+            (h,s,v) = rgb_to_hsv(r/255.,g/255.,b/255.)
+            pixelVal = int(100*v)
+            #build histogram
+            #histogram[pixelVal] += 1
+            valList += [pixelVal]
+    #print histogram
+    # calculate standard deviation of histogram
+    return numpy.var(valList)
     
 def getHSV((r,g,b)): 
+    """A Helper function that takes in a tuple of r,g,b values for a single pixel and converts to HSV values. 
+    Returns a tuple of hsv values for that pixel."""
     return rgb_to_hsv(r/255., g/255., b/255.)
